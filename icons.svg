@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg14384"
+   version="1.1"
+   inkscape:version="0.48.1 r9760"
+   sodipodi:docname="New document 4">
+  <defs
+     id="defs14386">
+    <filter
+       id="filter15305"
+       inkscape:menu-tooltip="Draws a black outline around"
+       inkscape:menu="ABCs"
+       inkscape:label="Drop shadow"
+       color-interpolation-filters="sRGB"
+       width="1.5"
+       height="1.5"
+       x="-.25"
+       y="-.25">
+      <feGaussianBlur
+         id="feGaussianBlur15307"
+         stdDeviation="2"
+         in="SourceAlpha"
+         result="result0" />
+      <feComposite
+         in2="result0"
+         id="feComposite15309"
+         result="result3"
+         operator="arithmetic"
+         in="SourceGraphic"
+         k2="1"
+         k3="10" />
+      <feComposite
+         in2="result3"
+         id="feComposite15311"
+         k2="1"
+         operator="in"
+         in="result3"
+         result="fbSourceGraphic" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix15313" />
+      <feGaussianBlur
+         id="feGaussianBlur15315"
+         in="fbSourceGraphicAlpha"
+         stdDeviation="15"
+         result="blur" />
+      <feColorMatrix
+         id="feColorMatrix15317"
+         result="bluralpha"
+         type="matrix"
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.4 0 " />
+      <feOffset
+         id="feOffset15319"
+         in="bluralpha"
+         dx="30"
+         dy="30"
+         result="offsetBlur" />
+      <feMerge
+         id="feMerge15321">
+        <feMergeNode
+           id="feMergeNode15323"
+           in="offsetBlur" />
+        <feMergeNode
+           id="feMergeNode15325"
+           in="fbSourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter
+       id="filter15389"
+       inkscape:menu-tooltip="Draws a black outline around"
+       inkscape:menu="ABCs"
+       inkscape:label="Drop shadow"
+       color-interpolation-filters="sRGB"
+       width="1.5"
+       height="1.5"
+       x="-.25"
+       y="-.25">
+      <feGaussianBlur
+         id="feGaussianBlur15391"
+         stdDeviation="2"
+         in="SourceAlpha"
+         result="result0" />
+      <feComposite
+         id="feComposite15393"
+         in2="result0"
+         result="result3"
+         operator="arithmetic"
+         in="SourceGraphic"
+         k2="1"
+         k3="10" />
+      <feComposite
+         id="feComposite15395"
+         in2="result3"
+         k2="1"
+         operator="in"
+         in="result3"
+         result="fbSourceGraphic" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix15397" />
+      <feGaussianBlur
+         id="feGaussianBlur15399"
+         stdDeviation="2"
+         in="fbSourceGraphicAlpha"
+         result="result0" />
+      <feComposite
+         id="feComposite15401"
+         in2="result0"
+         result="result3"
+         operator="arithmetic"
+         in="fbSourceGraphic"
+         k2="1"
+         k3="10" />
+      <feComposite
+         id="feComposite15403"
+         in2="result3"
+         k2="1"
+         operator="in"
+         in="result3"
+         result="fbSourceGraphic" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix15405" />
+      <feGaussianBlur
+         id="feGaussianBlur15407"
+         in="fbSourceGraphicAlpha"
+         stdDeviation="15"
+         result="blur" />
+      <feColorMatrix
+         id="feColorMatrix15409"
+         result="bluralpha"
+         type="matrix"
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.4 0 " />
+      <feOffset
+         id="feOffset15411"
+         in="bluralpha"
+         dx="30"
+         dy="30"
+         result="offsetBlur" />
+      <feMerge
+         id="feMerge15413">
+        <feMergeNode
+           id="feMergeNode15415"
+           in="offsetBlur" />
+        <feMergeNode
+           id="feMergeNode15417"
+           in="fbSourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="-102.14286"
+     inkscape:cy="-366.05528"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="745"
+     inkscape:window-x="-3"
+     inkscape:window-y="-3"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata14389">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#ff0000;fill-rule:evenodd;stroke:#000000;stroke-width:4px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 362.90625 167.25 C 186.08573 169.48971 43.4375 313.52307 43.4375 490.875 C 43.4375 669.62341 188.34534 814.53125 367.09375 814.53125 C 545.84216 814.53125 690.75 669.62341 690.75 490.875 C 690.75 312.12659 545.84216 167.25 367.09375 167.25 C 365.69728 167.25 364.29854 167.23236 362.90625 167.25 z M 367.15625 222.1875 C 421.20416 222.1875 471.5171 238.16378 513.65625 265.625 L 166.03125 669.15625 C 123.95864 621.72621 98.40625 559.32427 98.40625 490.9375 C 98.40625 342.52149 218.74024 222.1875 367.15625 222.1875 z M 554.53125 298.34375 C 604.69532 347.1693 635.875 415.40661 635.875 490.9375 C 635.875 639.35351 515.57226 759.65625 367.15625 759.65625 C 305.97416 759.65625 249.58142 739.21074 204.40625 704.78125 L 554.53125 298.34375 z "
+       id="path14398" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#ff0000;fill-rule:evenodd;stroke:#000000;stroke-width:4px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter15305)"
+       d="m -538.47322,157.2969 c -176.82052,2.23971 -319.46875,146.27307 -319.46875,323.625 0,178.74841 144.90784,323.65625 323.65625,323.65625 178.74841,0 323.65625,-144.90784 323.65625,-323.65625 0,-178.74841 -144.90784,-323.625 -323.65625,-323.625 -1.39647,0 -2.79521,-0.0176 -4.1875,0 z m 4.25,54.9375 c 54.04791,0 104.36085,15.97628 146.5,43.4375 l -347.625,403.53125 c -42.07261,-47.43004 -67.625,-109.83198 -67.625,-178.21875 0,-148.41601 120.33399,-268.75 268.75,-268.75 z m 187.375,76.15625 c 50.16407,48.82555 81.34375,117.06286 81.34375,192.59375 0,148.41601 -120.30274,268.71875 -268.71875,268.71875 -61.18209,0 -117.57483,-20.44551 -162.75,-54.875 l 350.125,-406.4375 z"
+       id="path14398-4"
+       inkscape:export-filename="/home/clewin/Dev/GitHub/migovec-survey/static/icons/requires_enlargement.png"
+       inkscape:export-xdpi="23.58399"
+       inkscape:export-ydpi="23.58399" />
+    <path
+       style="fill:#008c00;filter:url(#filter15389)"
+       d="M -454.28125 1129.5 C -632.59033 1129.5 -777.15625 1274.0659 -777.15625 1452.375 C -777.15625 1630.6841 -632.59033 1775.2188 -454.28125 1775.2188 C -275.97217 1775.2188 -131.4375 1630.6841 -131.4375 1452.375 C -131.4375 1274.0659 -275.97217 1129.5 -454.28125 1129.5 z M -455.71875 1195.25 C -309.77441 1195.25 -191.46875 1312.9071 -191.46875 1458.0625 C -191.46875 1603.2179 -309.77441 1720.9062 -455.71875 1720.9062 C -601.66309 1720.9062 -719.96875 1603.2179 -719.96875 1458.0625 C -719.96875 1312.9071 -601.66309 1195.25 -455.71875 1195.25 z "
+       id="path15378"
+       inkscape:export-filename="/home/clewin/Dev/GitHub/migovec-survey/static/icons/open_lead.png"
+       inkscape:export-xdpi="23.787447"
+       inkscape:export-ydpi="23.787447" />
+  </g>
+</svg>

@@ -20,11 +20,13 @@
     <style type="text/css">
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0 }
-      #map-canvas { height: 100% }
+      #map-canvas { height: 80% }
     </style>
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBt22ZSRQ418n6tFZkK0ghcNy0NyZRamdg&sensor=false">
     </script>
+    <script type="text/javascript" src="maplabel-compiled.js"></script>
+    <script type="text/javascript" src="markerwithlabel_packed.js"></script>
     <script type="text/javascript">
       var initialize = function() {
         var mapOptions = {
@@ -57,7 +59,7 @@
 				return null;
 			}
 			var tileNum = calculateTileNum(coord, zoom);
-			return "/survey/year/2012/survey/SysMig/tiles/zoom/" + zoom + "/t_" + tileNum + ".png";
+			return "survey/year/2012/survey/SysMig/zoom/" + zoom + "/t_" + tileNum + ".png";
 		},
 		tileSize: new google.maps.Size(256,256),
 		maxZoom: 5,
@@ -72,6 +74,7 @@
             mapOptions);
 	map.mapTypes.set("Survey", drawnSurveyMapType);
 	map.setMapTypeId("Survey");
+	window.map = map;
 	
 	addMarkers(map);
 	
@@ -101,10 +104,12 @@
 	var marker = new google.maps.Marker({
 		position:new google.maps.LatLng(0, 0.0),
 		title:"Requires Enlargement",
-		icon:"/static/icons/requires_enlargement_icon.png",
+		icon:"icons/requires_enlargement_icon.png",
 		draggable:true
 	});
 	marker.setMap(map);
+	
+	
       }
       // Normalizes the coords that tiles repeat across the x axis (horizontally)
 	// like the standard Google map tiles.
@@ -129,11 +134,65 @@
 		  };
 	  }
       
+    var addMarkers = function() {
+    
+        var marker = new google.maps.Marker({
+            position:new google.maps.LatLng(0, 0.0),
+            title:"Requires Enlargement",
+            icon:"icons/requires_enlargement_icon.png",
+            draggable:true
+            });
+        marker.setMap(map);
+    }      
+      
+    function addTextLabel() {
+        var textInput = document.getElementById('labelInputText');
+        
+        var labelPosition = new google.maps.LatLng(51.53870, -0.01652);
+        
+	    var label = new MapLabel({
+            text: textInput.value,
+            position: labelPosition,
+            map: window.map,
+            fontSize: 12
+        });
+        
+        //label.set('position', labelPosition);
+
+        var draggableLabel = new MarkerWithLabel({
+            position: labelPosition,
+            draggable: true,
+            raiseOnDrag: true,
+            map: window.map,
+            labelContent: textInput.value,
+            labelAnchor: new google.maps.Point(22, 0),
+            //labelClass: "labels", // the CSS class for the label
+            //labelStyle: {opacity: 0.75}
+        });
+
+        //google.maps.event.addListener(window.map, 'click', function() {
+        //window.map.setZoom(8);
+
+        //});
+
+      }
+      
+      function addDraggableTextMarker() {
+      
+      }
+      
+      
       google.maps.event.addDomListener(window, 'load', initialize);
       
     </script>
  </head>
  <body>
+	<div id="edit-palette">
+		<h2>Edit palette</h2>
+		label <input type="text" class="loginButtons" id="labelInputText" value="New Label" /><br/>
+		min zoom level <input type="text" class="loginButtons" value="4" />
+		 <button type="button" onclick="addTextLabel();">Add Marker</button>
+	</div>
 	<div id="map-canvas"/>
  </body>
 </html>

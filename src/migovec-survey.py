@@ -1,5 +1,7 @@
 import webapp2
+import json
 from google.appengine.api import users
+
 
 class MainPage(webapp2.RequestHandler):
   def get(self):
@@ -25,6 +27,16 @@ class GetMarkers(webapp2.RequestHandler):
 	def get(self):
 		pass
 
-app = webapp2.WSGIApplication([('/', MainPage), ('/login', Login)],
+class GetLabels(webapp2.RequestHandler):
+	def get(self):
+		root = {}
+		labels = []
+		labels.append({'label':'Atlantis', 'position':(51.53870, -0.01652), 'id':'123'})
+		labels.append({'label':'Cactus Junction', 'position':(0,0), 'id':'124'})
+		root['labels'] = labels
+		self.response.headers['Content-Type'] = 'application/json'
+		self.response.out.write(json.dumps(root))
+
+app = webapp2.WSGIApplication([('/', MainPage), ('/login', Login), ('/labels',GetLabels)],
                               debug=True)
 

@@ -25,6 +25,7 @@
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBt22ZSRQ418n6tFZkK0ghcNy0NyZRamdg&sensor=false">
     </script>
+    <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="maplabel-compiled.js"></script>
     <script type="text/javascript" src="markerwithlabel_packed.js"></script>
     <script type="text/javascript">
@@ -77,7 +78,8 @@
 	window.map = map;
 	
 	addMarkers(map);
-	
+	addStoredMarkers();
+    
 			// bounds of the desired area
 		var allowedBounds = new google.maps.LatLngBounds(
 		     new google.maps.LatLng(-90,-180), 
@@ -99,18 +101,49 @@
 	
       };
       
-      function addMarkers(map) {
-      
-	var marker = new google.maps.Marker({
-		position:new google.maps.LatLng(0, 0.0),
-		title:"Requires Enlargement",
-		icon:"icons/requires_enlargement_icon.png",
-		draggable:true
-	});
-	marker.setMap(map);
-	
-	
+      function addMarkers(map) {        
+        var marker = new google.maps.Marker({
+            position:new google.maps.LatLng(0, 0.0),
+            title:"Requires Enlargement",
+            icon:"icons/requires_enlargement_icon.png",
+            draggable:true
+        });
+        marker.setMap(map);
       }
+      
+      function addStoredMarkers() {
+     
+        jQuery.getJSON( "http://localhost:8080/labels", 
+            function( json ) {
+                var labelArr = json.labels;
+                for(var l=0; l<labelArr.length; l++) {
+                    var storedLabelPosition = labelArr[l].position;
+                    
+                    var storedText = labelArr[l].label;
+                    var latLng = new google.maps.LatLng(storedLabelPosition[0],storedLabelPosition[1]);
+                    window.alert(latLng);
+                    
+                    //var readOnlyLabel = new MapLabel({
+                    //    text: storedText,
+                    //    position: latLng,
+                    //    map: window.map,
+                    //    fontSize: 12
+                    //});
+                    
+                    var draggableLabel = new MarkerWithLabel({
+                        position: latLng,
+                        draggable: true,
+                        raiseOnDrag: true,
+                        map: window.map,
+                        labelContent: storedText,
+                        labelAnchor: new google.maps.Point(22, 0),
+                    });
+                }
+
+            });
+      
+      }
+      
       // Normalizes the coords that tiles repeat across the x axis (horizontally)
 	// like the standard Google map tiles.
 	function getNormalizedCoord(coord, zoom) {
@@ -157,7 +190,7 @@
             fontSize: 12
         });
         
-        //label.set('position', labelPosition);
+
 
         var draggableLabel = new MarkerWithLabel({
             position: labelPosition,
@@ -166,14 +199,7 @@
             map: window.map,
             labelContent: textInput.value,
             labelAnchor: new google.maps.Point(22, 0),
-            //labelClass: "labels", // the CSS class for the label
-            //labelStyle: {opacity: 0.75}
         });
-
-        //google.maps.event.addListener(window.map, 'click', function() {
-        //window.map.setZoom(8);
-
-        //});
 
       }
       

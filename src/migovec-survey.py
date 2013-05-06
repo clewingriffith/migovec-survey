@@ -46,15 +46,22 @@ class PutLabel(webapp2.RequestHandler):
 		
 		print json_data
 
+		idInPayload = json_data['id']
+		
+		if label_id != idInPayload:
+			self.error(400)
+			
 		#except:
 		#	self.error(400)
 			
 		print "Trying to get label by id " + label_id
 		m = Label.get_by_id(int(label_id))
-		newTextEn = json_data['text_en']
-		m.text_en = newTextEn
-		(lat,lng) = json_data['position']
-		m.position = db.GeoPt(lat,lng)
+		if json_data.has_key('text_en'):
+			newTextEn = json_data['text_en']
+			m.text_en = newTextEn
+		if json_data.has_key('position'):
+			(lat,lng) = json_data['position']
+			m.position = db.GeoPt(lat,lng)
 		m.put()
 
 """

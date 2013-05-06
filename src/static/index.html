@@ -62,7 +62,7 @@
 	map.mapTypes.set("Survey", drawnSurveyMapType);
 	map.setMapTypeId("Survey");
 	window.map = map;
-	
+	window.labels = {};
 	addMarkers(map);
 	addStoredMarkers();
     
@@ -102,37 +102,77 @@
 		var storedText = labelData.text_en;
                 var latLng = new google.maps.LatLng(storedLabelPosition[0],storedLabelPosition[1]);
 		
-		var draggableLabel = new MarkerWithLabel({
-		icon: {
-    path: google.maps.SymbolPath.CIRCLE,
-    scale: 0
-  },
-                        position: latLng,
-                        draggable: true,
-                        raiseOnDrag: false,
-                        map: window.map,
-                        labelContent: storedText,
-                        labelAnchor: new google.maps.Point(0, 0),
-                    });
+		var draggableLabel = new MapLabel({
+			text: storedText,
+			position: latLng,
+			map:window.map,
+			fontSize: 12,
+			align:'left'
+		});
+
+		var marker = new google.maps.Marker;
+		marker.bindTo('map',draggableLabel);
+		marker.bindTo('position', draggableLabel);
+		marker.setDraggable(window.editMode);
+		if(window.editMode == false) {
+			marker.setIcon({
+				path: google.maps.SymbolPath.CIRCLE,
+				scale: 0
+			});
+		}
+		//var draggableLabel = new MarkerWithLabel({
+			//empty icon so we just get the label
+		//	icon: {
+			    //~ path: google.maps.SymbolPath.CIRCLE,
+			    //~ scale: 0
+			//~ },
+                        //~ position: latLng,
+                        //~ draggable: true,
+                        //~ raiseOnDrag: false,
+                        //~ map: window.map,
+                        //~ labelContent: storedText,
+                        //~ labelAnchor: new google.maps.Point(0, 0),
+                    //~ });
 		    
-		    draggableLabel.datakey = labelData.id;
+		 draggableLabel.datakey = labelData.id;
+		 //draggableLabel.datakey = labelData.id;
 		    //delete draggableLabel.icon;
 		    //create closure for label id
+		    //Update the position when we drag
 		    (function(refLabel) {
-			google.maps.event.addListener(draggableLabel, "dragend",
+			google.maps.event.addListener(marker, "dragend",
 				function (mEvent) { 
-					window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
-					jQuery.ajax({
-						type: "PUT",
-						url: "/update/label/" + refLabel.datakey,
-						contentType: "application/json",
-						data: jQuery.toJSON({
-							"id": refLabel.datakey, 
-							"text_en":refLabel.labelContent, 
-							"position":[refLabel.position.lat(), refLabel.position.lng()]})
+					//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
+					updateLabelDatastore({
+						"id": refLabel.datakey, 
+						"position":[refLabel.position.lat(), refLabel.position.lng()]
 					});
 				});
 		    })(draggableLabel);
+		    
+		    //Set the id on the data fields when we click, so that we can edit the text 
+		    (function(refLabel) {
+			google.maps.event.addListener(marker, "mousedown",
+				function (mEvent) { 
+					var labelInputId = document.getElementById('labelInputId');
+					var labelInputText = document.getElementById('labelInputText');
+					labelInputId.value = refLabel.datakey;
+					labelInputText.value = refLabel.text;
+					//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
+					
+				});
+		    })(draggableLabel);
+		    
+		    window.labels[labelData.id] = draggableLabel;
+      }
+      
+      function updateLabelDatastore(labelData) {
+		jQuery.ajax({
+			type: "PUT",
+			url: "/update/label/" + labelData.id,
+			contentType: "application/json",
+			data: jQuery.toJSON(labelData)
+			});
       }
       
       function addStoredMarkers() {
@@ -142,48 +182,15 @@
                 var labelArr = json.labels;
                 for(var l=0; l<labelArr.length; l++) {
 		    addLabelToMap(labelArr[l]);
-                    //var storedLabelPosition = labelArr[l].position;
-                    
-                    //var storedText = labelArr[l].text_en;
-                    //var latLng = new google.maps.LatLng(storedLabelPosition[0],storedLabelPosition[1]);
-                    //window.alert(latLng);
-                    
-                    //var readOnlyLabel = new MapLabel({
-                    //    text: storedText,
-                    //    position: latLng,
-                    //    map: window.map,
-                    //    fontSize: 12
-                    //});
-                    //window.alert(labelArr[l].id)
-                    //~ var draggableLabel = new MarkerWithLabel({
-                        //~ position: latLng,
-                        //~ draggable: true,
-                        //~ raiseOnDrag: false,
-                        //~ map: window.map,
-                        //~ labelContent: storedText,
-                        //~ labelAnchor: new google.maps.Point(0, 0),
-                    //~ });
-		    //~ draggableLabel.datakey = labelArr[l].id;
-		    //~ //create closure for label id
-		    //~ (function(refLabel) {
-			//~ google.maps.event.addListener(draggableLabel, "dragend",
-				//~ function (mEvent) { 
-					//~ window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
-					//~ jQuery.ajax({
-						//~ type: "PUT",
-						//~ url: "/update/label/" + refLabel.datakey,
-						//~ contentType: "application/json",
-						//~ data: jQuery.toJSON({
-							//~ "id": refLabel.datakey, 
-							//~ "text_en":refLabel.labelContent, 
-							//~ "position":[refLabel.position.lat(), refLabel.position.lng()]})
-					//~ });
-				//~ });
-		    //~ })(draggableLabel);
                 }
 
             });
       
+		
+      		var labelInputText = document.getElementById('labelInputText');
+		google.maps.event.addDomListener(labelInputText, 'keyup', updateLabelField);
+		google.maps.event.addDomListener(labelInputText, 'change', saveLabelField);
+
       }
       
       // Normalizes the coords that tiles repeat across the x axis (horizontally)
@@ -244,11 +251,38 @@
 		
 	}
       
-      function addDraggableTextMarker() {
+	//Called while typing into the label text field
+	function updateLabelField() {
+		var textInput = document.getElementById('labelInputText');
+		var labelInputId = document.getElementById('labelInputId');
+		
+		if(!isNaN(labelInputId.value)) {
+			var label = window.labels[labelInputId.value];
+			if(textInput.value !== label.text) {
+				label.set('text', textInput.value);
+				label.set('unsaved', true);
+				label.set('fontColor', 'red'); //to imply that it hasn't been saved
+			}
+		}
+	}
+	
+	//called on hitting return on the label text field
+	function saveLabelField() {
+		var labelInputId = document.getElementById('labelInputId');
+		
+		if(!isNaN(labelInputId.value)) {
+			var label = window.labels[labelInputId.value];
+			label.set('unsaved', false);
+			label.set('fontColor', 'black'); //to imply that it hasn't been saved
+			
+			updateLabelDatastore({
+						"id": label.datakey, 
+						"text_en":label.text
+			});
+		}
+	}
       
-      }
-      
-      
+	window.editMode = true;
       google.maps.event.addDomListener(window, 'load', initialize);
       
     </script>
@@ -256,6 +290,7 @@
  <body>
 	<div id="edit-palette">
 		<h2>Edit palette</h2>
+		id  <input type="text" id="labelInputId" value="" disabled="disabled" /><br/>
 		label <input type="text" class="loginButtons" id="labelInputText" value="New Label" /><br/>
 		min zoom level <input type="text" class="loginButtons" value="4" />
 		 <button type="button" onclick="addTextLabel();">Add Marker</button>

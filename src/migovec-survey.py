@@ -2,23 +2,36 @@ import webapp2
 import json
 from google.appengine.api import users
 from google.appengine.ext import db
+import os
+from google.appengine.ext.webapp import template
 
 class Label(db.Model):
 	text_en = db.StringProperty(required=True)
 	position = db.GeoPtProperty(required=True)
+	zoom_level = db.IntegerProperty(required=True)
 	def asJson(self):
 		return json.dumps(self.asDict())
 	def asDict(self):
-		dic = {'id': self.key().id(), 'text_en':self.text_en, 'position':(self.position.lat, self.position.lon) }
+		dic = {
+			'id': self.key().id(),
+			'text_en':self.text_en, 
+			'position':(self.position.lat, self.position.lon),
+			'zoom_level':self.zoom_level
+		}
 		return dic
 
 class MainPage(webapp2.RequestHandler):
   def get(self):
-	self.redirect("static/index.html")
-      #self.response.headers['Content-Type'] = 'text/html'
-      #file = open("static/index.html")
-      
-      #self.response.write(file.read())
+	  ###GET EDIT MODE FROM PARAM
+	editMode = self.request.get('edit')
+	
+	template_values = {
+		'editMode': ("1" == editMode)
+	}
+
+	self.response.headers['Content-Type'] = 'text/html'
+	path = os.path.join(os.path.dirname(__file__), 'index.html')
+	self.response.out.write(template.render(path, template_values))
 
 class Login(webapp2.RequestHandler):
 	def get(self):
@@ -76,9 +89,10 @@ class PostLabel(webapp2.RequestHandler):
 			json_data = json.loads(raw_content)
 			print json_data
 			text_en = json_data['text_en']
+			zoom_level = int(json_data['zoom_level'])
 		except:
 			self.error(400)
-		newLabel = Label(text_en = text_en, position=db.GeoPt(0,0))
+		newLabel = Label(text_en = text_en, position=db.GeoPt(0,0), zoom_level=zoom_level)
 		newLabel.put()
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(newLabel.asJson())

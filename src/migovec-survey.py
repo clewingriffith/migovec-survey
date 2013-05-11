@@ -19,10 +19,22 @@ class Label(db.Model):
 			'zoom_level':self.zoom_level
 		}
 		return dic
+		
+class Photo(db.Model):
+	url = db.StringProperty(required=True)
+	position = db.GeoPtProperty(required=True)
+	def asJson(self):
+		return json.dumps(self.asDict())
+	def asDict(self):
+		dic = {
+			'id': self.key().id(),
+			'url':self.url, 
+			'position':(self.position.lat, self.position.lon),
+		}
+		return dic
 
 class MainPage(webapp2.RequestHandler):
   def get(self):
-	  ###GET EDIT MODE FROM PARAM
 	editMode = self.request.get('edit')
 	
 	template_values = {
@@ -77,6 +89,33 @@ class PutLabel(webapp2.RequestHandler):
 			m.position = db.GeoPt(lat,lng)
 		m.put()
 
+
+class PutPhoto(webapp2.RequestHandler):
+	def put(self, photo_id):
+		json_data = None;
+		#try:
+		raw_content = self.request.body
+		print raw_content
+		json_data = json.loads(raw_content)
+		
+		print json_data
+
+		idInPayload = json_data['id']
+		
+		if photo_id != idInPayload:
+			self.error(400)
+			
+		print "Trying to get photo by id " + photo_id
+		m = Photo.get_by_id(int(photo_id))
+		if json_data.has_key('url'):
+			newUrl = json_data['url']
+			m.url = newUrl
+		if json_data.has_key('position'):
+			(lat,lng) = json_data['position']
+			m.position = db.GeoPt(lat,lng)
+		m.put()
+
+
 """
 Create a new label at default position 0,0.
 Returns the JSON representation of the new label, including id field.
@@ -97,6 +136,25 @@ class PostLabel(webapp2.RequestHandler):
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(newLabel.asJson())
 	
+"""
+Create a new photo at default position 0,0.
+Returns the JSON representation of the new label, including id field.
+"""
+class PostPhoto(webapp2.RequestHandler):
+	def post(self):
+		try:
+			raw_content = self.request.body
+			print raw_content
+			json_data = json.loads(raw_content)
+			print json_data
+			url = json_data['url']
+			#url = "http://union.ic.ac.uk/rcc/caving/photo_archive/slovenia/highlights/Clewin_on_Concorde_2004_Photo_by_Jarvist_Frost-mediumquality.JPG";
+		except:
+			self.error(400)
+		newPhoto = Photo(url = url, position=db.GeoPt(0,0))
+		newPhoto.put()
+		self.response.headers['Content-Type'] = 'application/json'
+		self.response.out.write(newPhoto.asJson())
 
 class GetLabel(webapp2.RequestHandler):
 	def get(self, label_id):
@@ -120,6 +178,27 @@ class GetLabels(webapp2.RequestHandler):
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(json.dumps(root))
 
-app = webapp2.WSGIApplication([('/', MainPage), ('/login', Login), ('/labels',GetLabels), (r'/update/label/(.*)', PutLabel), ('/create/label', PostLabel), (r'/get/label/(.*)',GetLabel)],
+class GetPhotos(webapp2.RequestHandler):
+	def get(self):
+		allPhotosQuery = Photo.all()
+		allPhotos = allPhotosQuery.run(batch_size=1000)
+		root = {}
+		photos = []
+		for photo in allPhotos:
+			photos.append(photo.asDict())
+		
+		root['photos'] = photos
+		self.response.headers['Content-Type'] = 'application/json'
+		self.response.out.write(json.dumps(root))
+
+app = webapp2.WSGIApplication([('/', MainPage), 
+('/login', Login),
+('/labels',GetLabels), 
+('/photos',GetPhotos), 
+(r'/update/label/(.*)', PutLabel),
+(r'/update/photo/(.*)', PutPhoto),
+('/create/label', PostLabel), 
+('/create/photo', PostPhoto), 
+(r'/get/label/(.*)',GetLabel)],
                               debug=True)
 

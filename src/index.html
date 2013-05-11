@@ -30,7 +30,7 @@
 	clear:both;
       }
 	#map-canvas {
-	height: 100%;
+	 height: 100% ; 
 	
       }
     </style>
@@ -88,8 +88,11 @@ var initialize = function() {
 	window.map = map;
 	window.labels = {};
 	
-	addStoredMarkers();
-    
+	//window.alert('blah');
+	addStoredLabelMarkers();
+	//window.alert('blah2');
+	addStoredPhotoMarkers();
+    //window.alert('blah3');
 	// bounds of the desired area
 	var allowedBounds = new google.maps.LatLngBounds(
 		new google.maps.LatLng(-90,-180), 
@@ -149,40 +152,93 @@ function addLabelToMap(labelData) {
 			scale: 0
 		});
 	}
+	
+	if(window.editMode) {
 		    
-	draggableLabel.datakey = labelData.id;
+		draggableLabel.datakey = labelData.id;
 
-	//create closure for label id
-	//Update the position when we drag
-	(function(refLabel) {
-		google.maps.event.addListener(marker, "dragend",
-		function (mEvent) { 
-			//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
-			updateLabelDatastore({
-				"id": refLabel.datakey, 
-				"position":[refLabel.position.lat(), refLabel.position.lng()]
+		//create closure for label id
+		//Update the position when we drag
+		(function(refLabel) {
+			google.maps.event.addListener(marker, "dragend",
+			function (mEvent) { 
+				//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
+				updateLabelDatastore({
+					"id": refLabel.datakey, 
+					"position":[refLabel.position.lat(), refLabel.position.lng()]
+				});
 			});
-		});
-	})(draggableLabel);
-		    
-	//Set the id on the data fields when we click, so that we can edit the text 
-	(function(refLabel) {
-		google.maps.event.addListener(marker, "mousedown",
-		function (mEvent) { 
-			var labelInputId = document.getElementById('labelInputId');
-			var labelInputText = document.getElementById('labelInputText');
-			labelInputId.value = refLabel.datakey;
-			labelInputText.value = refLabel.text;
-			//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
-			
-		});
-	})(draggableLabel);
-		    
-	window.labels[labelData.id] = draggableLabel;
+		})(draggableLabel);
+			    
+		//Set the id on the data fields when we click, so that we can edit the text 
+		(function(refLabel) {
+			google.maps.event.addListener(marker, "mousedown",
+			function (mEvent) { 
+				var labelInputId = document.getElementById('labelInputId');
+				var labelInputText = document.getElementById('labelInputText');
+				labelInputId.value = refLabel.datakey;
+				labelInputText.value = refLabel.text;
+				//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
+				
+			});
+		})(draggableLabel);
+			    
+		window.labels[labelData.id] = draggableLabel;
+	}
 }
-      
+
+function addPhotoToMap(photoData) {
+	window.alert('adding photo to map');
+	var storedPhotoPosition = photoData.position;
+	var photoUrl = photoData.url;
+	var latLng = new google.maps.LatLng(storedPhotoPosition[0],storedPhotoPosition[1]);
+	
+	var photoMarker = new google.maps.Marker({
+		position: latLng,
+		map: window.map,
+		icon: 'static/icons/photo.png',
+		//datakey = photoData.id
+		//draggable: window.editMode
+	});
+	
+	photoMarker.datakey = photoData.id;
+	
+	var contentString = '<img style="width: auto; max-height: 90%;" src="' + photoUrl + '"/>';
+
+	var infowindow = new google.maps.InfoWindow({
+		      content: contentString
+	});
+
+	google.maps.event.addListener(photoMarker, 'click', function() {
+		    infowindow.open(map,photoMarker);
+	});
+	
+	if(window.editMode) {
+		photoMarker.setDraggable(true);
+		
+		//create closure for label id
+		//Update the position when we drag
+		(function(refMarker) {
+			google.maps.event.addListener(refMarker, "dragend",
+			function (mEvent) { 
+				window.alert("Drag End for " + refMarker.datakey +": " + mEvent.latLng.toString()); 
+				updatePhotoDatastore({
+					"id": refMarker.datakey, 
+					"position":[refMarker.position.lat(), refMarker.position.lng()]
+				});
+			});
+		})(photoMarker);
+		
+		window.photos[photoData.id] = photoMarker;
+	}
+}
+
 function updateLabelDatastore(labelData) {
 	updateDatastore("label", labelData);
+}
+
+function updatePhotoDatastore(labelData) {
+	updateDatastore("photo", labelData);
 }
 
 function updateDatastore(type, data) {
@@ -194,7 +250,7 @@ function updateDatastore(type, data) {
 		});
 }
       
-function addStoredMarkers() {
+function addStoredLabelMarkers() {
 
 	jQuery.getJSON( "/labels", 
 		function( json ) {
@@ -204,9 +260,22 @@ function addStoredMarkers() {
 		}}
 	);
 	
-	var labelInputText = document.getElementById('labelInputText');
-	google.maps.event.addDomListener(labelInputText, 'keyup', updateLabelField);
-	google.maps.event.addDomListener(labelInputText, 'change', saveLabelField);
+	if(window.editMode) {
+		var labelInputText = document.getElementById('labelInputText');
+		google.maps.event.addDomListener(labelInputText, 'keyup', updateLabelField);
+		google.maps.event.addDomListener(labelInputText, 'change', saveLabelField);
+	}
+}
+
+function addStoredPhotoMarkers() {
+	//window.alert('here');
+	jQuery.getJSON( "/photos", 
+		function( json ) {
+		var photoArr = json.photos;
+		for(var p=0; p<photoArr.length; p++) {
+		    addPhotoToMap(photoArr[p]);
+		}}
+	);
 }
       
 // Normalizes the coords that tiles repeat across the x axis (horizontally)
@@ -234,9 +303,9 @@ function getNormalizedCoord(coord, zoom) {
       
       
 function addTextLabel() {
-	if(window.editMode == false) {
-		return;
-	}
+	//if(window.editMode == false) {
+	//	return;
+	//}
 	var zoomLevelField =  document.getElementById('zoomLevelField');
 	
 	var newLabelData = {
@@ -255,6 +324,24 @@ function addTextLabel() {
 		addLabelToMap(newLabelData);
 	});
 	
+}
+
+function addNewPhoto() {
+	
+	var newPhotoData = {
+		"url": "static/icons/miglogo.png",
+		"position": [0, 0],
+	}
+	
+	jQuery.ajax({
+		type: "POST",
+		url: "/create/photo",
+		contentType: "application/json",
+		data: jQuery.toJSON(newPhotoData)
+	}).done(function( msg ) {
+		newPhotoData.id = msg.id;
+		addPhotoToMap(newPhotoData);
+	});
 }
 
 //Called while typing into the label text field
@@ -310,6 +397,8 @@ google.maps.event.addDomListener(window, 'load', initialize);
 		label <input type="text" class="loginButtons" id="labelInputText" value="New Label" /><br/>
 		zoom level <input type="text" class="loginButtons" id="zoomLevelField" value="2" />
 		 <button type="button" onclick="addTextLabel();">Add Marker</button>
+		photo Url <input type="text" id="photoUrlInput" value="" /><br/>
+		<button type="button" onclick="addNewPhoto();">Add Photo</button>
 	</div>
       {% endif %}
 	<div id="pagebody" >

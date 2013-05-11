@@ -18,6 +18,7 @@
 		  <include name="**/*.py" />
 		  <include name="static/*.html" />
 		  <include name="static/*.js" />
+		  <include name="static/icons/*" />
 		</fileset>
 		</resources>
 		</copy>

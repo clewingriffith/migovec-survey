@@ -4,8 +4,35 @@
 	             <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <style type="text/css">
       html { height: 100% }
-      body { height: 100%; margin: 0; padding: 0 }
-      #map-canvas { height: 80% }
+      body { height: 100%; margin: 0; padding: 0;  }
+      #topbar {
+	height: 70px;
+	min-width: 960px;
+	width: 100%;
+	background: #F1F1F1;
+	border-bottom: 1px solid #DFDFDF;
+      }
+      #topbar img {
+	float: left;
+	margin-left: 10px;
+      }
+      h1 {
+	font-family: arial,sans-serif;
+	font-weight: bold;
+	font-size: 24pt;
+	float: left;
+	color: #606060;
+	margin-bottom: 2px;
+	margin-left: 10px;
+      }
+      #pagebody {
+     	height: 100%;
+	clear:both;
+      }
+	#map-canvas {
+	height: 100%;
+	
+      }
     </style>
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBt22ZSRQ418n6tFZkK0ghcNy0NyZRamdg&sensor=false">
@@ -27,10 +54,10 @@ var initialize = function() {
         };
 	
 	// Bounds for North America
-	var strictBounds = new google.maps.LatLngBounds(
-		new google.maps.LatLng(-20, -180.0), 
-		new google.maps.LatLng(20, 180.90)
-	);
+	//var strictBounds = new google.maps.LatLngBounds(
+	//	new google.maps.LatLng(-20, -180.0), 
+	//	new google.maps.LatLng(20, 180.90)
+	//);
    
 	var calculateTileNum = function(coord, zoom) {
 		return coord.y * (1<<zoom) + coord.x;
@@ -155,11 +182,15 @@ function addLabelToMap(labelData) {
 }
       
 function updateLabelDatastore(labelData) {
+	updateDatastore("label", labelData);
+}
+
+function updateDatastore(type, data) {
 	jQuery.ajax({
 		type: "PUT",
-		url: "/update/label/" + labelData.id,
+		url: "/update/" + type + "/" + data.id,
 		contentType: "application/json",
-		data: jQuery.toJSON(labelData)
+		data: jQuery.toJSON(data)
 		});
 }
       
@@ -264,11 +295,16 @@ window.editMode = false;
 {% endif %}
 google.maps.event.addDomListener(window, 'load', initialize);      
     </script>
+    <title>Migovec Survey</title>
  </head>
  <body>
+	<div id="topbar">
+	<img src="static/icons/miglogo.png" />
 	<h1>Migovec Survey</h1>
+	</div>
       {% if editMode %}
         <div id="edit-palette">
+		
 		<h2>Edit palette</h2>
 		id  <input type="text" id="labelInputId" value="" disabled="disabled" /><br/>
 		label <input type="text" class="loginButtons" id="labelInputText" value="New Label" /><br/>
@@ -276,6 +312,8 @@ google.maps.event.addDomListener(window, 'load', initialize);
 		 <button type="button" onclick="addTextLabel();">Add Marker</button>
 	</div>
       {% endif %}
-	<div id="map-canvas"/>
+	<div id="pagebody" >
+		<div id="map-canvas"/>
+	</div>
  </body>
 </html>

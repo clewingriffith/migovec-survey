@@ -15,28 +15,25 @@
     <script type="text/javascript" src="maplabel-compiled.js"></script>
     <script type="text/javascript" src="markerwithlabel_packed.js"></script>
     <script type="text/javascript">
-      var initialize = function() {
+var initialize = function() {
         var mapOptions = {
-          center: new google.maps.LatLng(0, 0.0),
-          zoom: 1,
-	  streetViewControl: false,
-	  scaleControl:false, //would love to have this, but can't work out how to set the bounds. By default it assumes the size of the earth.
-	  mapTypeControlOptions: {
-		mapTypeIds: ["Survey"]
-	  }
-	  
+		center: new google.maps.LatLng(0, 0.0),
+		zoom: 1,
+		streetViewControl: false,
+		scaleControl:false, //would love to have this, but can't work out how to set the bounds. By default it assumes the size of the earth.
+		mapTypeControlOptions: {
+			mapTypeIds: ["Survey"]
+		}
         };
 	
-		// Bounds for North America
-	   var strictBounds = new google.maps.LatLngBounds(
-	     new google.maps.LatLng(-20, -180.0), 
-	     new google.maps.LatLng(20, 180.90)
-	   );
-
-	 
+	// Bounds for North America
+	var strictBounds = new google.maps.LatLngBounds(
+		new google.maps.LatLng(-20, -180.0), 
+		new google.maps.LatLng(20, 180.90)
+	);
    
 	var calculateTileNum = function(coord, zoom) {
-	   return coord.y * (1<<zoom) + coord.x;
+		return coord.y * (1<<zoom) + coord.x;
 	};
 	
 	var drawnSurveyMapTypeOptions = {
@@ -46,7 +43,7 @@
 				return null;
 			}
 			var tileNum = calculateTileNum(coord, zoom);
-			return "survey/year/2012/survey/SysMig/zoom/" + zoom + "/t_" + tileNum + ".png";
+			return "static/survey/year/2012/survey/SysMig/zoom/" + zoom + "/t_" + tileNum + ".png";
 		},
 		tileSize: new google.maps.Size(256,256),
 		maxZoom: 5,
@@ -63,228 +60,205 @@
 	map.setMapTypeId("Survey");
 	window.map = map;
 	window.labels = {};
-	addMarkers(map);
+	
 	addStoredMarkers();
     
-			// bounds of the desired area
-		var allowedBounds = new google.maps.LatLngBounds(
-		     new google.maps.LatLng(-90,-180), 
-		     new google.maps.LatLng(90,180)
-		);
-		var lastValidCenter = map.getCenter();
+	// bounds of the desired area
+	var allowedBounds = new google.maps.LatLngBounds(
+		new google.maps.LatLng(-90,-180), 
+		new google.maps.LatLng(90,180)
+	);
+	var lastValidCenter = map.getCenter();
 
-		google.maps.event.addListener(map, 'center_changed', function() {
-		    if (allowedBounds.contains(map.getCenter())) {
+	google.maps.event.addListener(map, 'center_changed', function() {
+		if (allowedBounds.contains(map.getCenter())) {
 			// still within valid bounds, so save the last valid position
 			lastValidCenter = map.getCenter();
 			return; 
-		    }
-
-		    // not valid anymore => return to last valid position
-		    map.panTo(lastValidCenter);
-		});
+		}
+		// not valid anymore => return to last valid position
+		map.panTo(lastValidCenter);
+	});
 	
-	
-      };
+	google.maps.event.addListener(map, 'zoom_changed', function() {
+		//document.//window.alert("zoom = " map.getZoom());
+		var zoomField = document.getElementById('zoomLevelField');
+		zoomField.value=map.getZoom();
+	});
+};
       
-      function addMarkers(map) {        
+function addMarkers(map) {        
         var marker = new google.maps.Marker({
-            position:new google.maps.LatLng(0, 0.0),
-            title:"Requires Enlargement",
-            icon:"icons/requires_enlargement_icon.png",
-            draggable:true
+		position:new google.maps.LatLng(0, 0.0),
+		title:"Requires Enlargement",
+		icon:"icons/requires_enlargement_icon.png",
+		draggable:true
         });
         marker.setMap(map);
-      }
+}
       
-      function addLabelToMap(labelData) {
-		var storedLabelPosition = labelData.position;
-		var storedText = labelData.text_en;
-                var latLng = new google.maps.LatLng(storedLabelPosition[0],storedLabelPosition[1]);
+function addLabelToMap(labelData) {
+	var storedLabelPosition = labelData.position;
+	var storedText = labelData.text_en;
+	var latLng = new google.maps.LatLng(storedLabelPosition[0],storedLabelPosition[1]);
 		
-		var draggableLabel = new MapLabel({
-			text: storedText,
-			position: latLng,
-			map:window.map,
-			fontSize: 12,
-			align:'left'
+	var draggableLabel = new MapLabel({
+		text: storedText,
+		position: latLng,
+		map:window.map,
+		fontSize: 12,
+		align:'left',
+		minZoom:labelData.zoom_level,
+		maxZoom:labelData.zoom_level
+	});
+
+	var marker = new google.maps.Marker;
+	marker.bindTo('map',draggableLabel);
+	marker.bindTo('position', draggableLabel);
+	marker.setDraggable(window.editMode);
+	if(window.editMode == false) {
+		marker.setIcon({
+			path: google.maps.SymbolPath.CIRCLE,
+			scale: 0
 		});
-
-		var marker = new google.maps.Marker;
-		marker.bindTo('map',draggableLabel);
-		marker.bindTo('position', draggableLabel);
-		marker.setDraggable(window.editMode);
-		if(window.editMode == false) {
-			marker.setIcon({
-				path: google.maps.SymbolPath.CIRCLE,
-				scale: 0
-			});
-		}
-		//var draggableLabel = new MarkerWithLabel({
-			//empty icon so we just get the label
-		//	icon: {
-			    //~ path: google.maps.SymbolPath.CIRCLE,
-			    //~ scale: 0
-			//~ },
-                        //~ position: latLng,
-                        //~ draggable: true,
-                        //~ raiseOnDrag: false,
-                        //~ map: window.map,
-                        //~ labelContent: storedText,
-                        //~ labelAnchor: new google.maps.Point(0, 0),
-                    //~ });
-		    
-		 draggableLabel.datakey = labelData.id;
-		 //draggableLabel.datakey = labelData.id;
-		    //delete draggableLabel.icon;
-		    //create closure for label id
-		    //Update the position when we drag
-		    (function(refLabel) {
-			google.maps.event.addListener(marker, "dragend",
-				function (mEvent) { 
-					//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
-					updateLabelDatastore({
-						"id": refLabel.datakey, 
-						"position":[refLabel.position.lat(), refLabel.position.lng()]
-					});
-				});
-		    })(draggableLabel);
-		    
-		    //Set the id on the data fields when we click, so that we can edit the text 
-		    (function(refLabel) {
-			google.maps.event.addListener(marker, "mousedown",
-				function (mEvent) { 
-					var labelInputId = document.getElementById('labelInputId');
-					var labelInputText = document.getElementById('labelInputText');
-					labelInputId.value = refLabel.datakey;
-					labelInputText.value = refLabel.text;
-					//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
-					
-				});
-		    })(draggableLabel);
-		    
-		    window.labels[labelData.id] = draggableLabel;
-      }
-      
-      function updateLabelDatastore(labelData) {
-		jQuery.ajax({
-			type: "PUT",
-			url: "/update/label/" + labelData.id,
-			contentType: "application/json",
-			data: jQuery.toJSON(labelData)
-			});
-      }
-      
-      function addStoredMarkers() {
-     
-        jQuery.getJSON( "/labels", 
-            function( json ) {
-                var labelArr = json.labels;
-                for(var l=0; l<labelArr.length; l++) {
-		    addLabelToMap(labelArr[l]);
-                }
-
-            });
-      
-		
-      		var labelInputText = document.getElementById('labelInputText');
-		google.maps.event.addDomListener(labelInputText, 'keyup', updateLabelField);
-		google.maps.event.addDomListener(labelInputText, 'change', saveLabelField);
-
-      }
-      
-      // Normalizes the coords that tiles repeat across the x axis (horizontally)
-	// like the standard Google map tiles.
-	function getNormalizedCoord(coord, zoom) {
-		  var y = coord.y;
-		  var x = coord.x;
-
-		  // tile range in one direction range is dependent on zoom level
-		  // 0 = 1 tile, 1 = 2 tiles, 2 = 4 tiles, 3 = 8 tiles, etc
-		  var tileRange = 1 << zoom;
-
-		  // don't repeat across y-axis (vertically)
-		  if (y < 0 || y >= tileRange) {
-		    return null;
-		  }
-		  if (x < 0 || x >= tileRange) {
-		    return null;
-		  }
-		  return {
-		    x: x,
-		    y: y
-		  };
-	  }
-      
-    var addMarkers = function() {
-    
-        var marker = new google.maps.Marker({
-            position:new google.maps.LatLng(0, 0.0),
-            title:"Requires Enlargement",
-            icon:"icons/requires_enlargement_icon.png",
-            draggable:true
-            });
-        marker.setMap(map);
-    }      
-      
-	function addTextLabel() {
-		var textInput = document.getElementById('labelInputText');
-		
-		var labelPosition = new google.maps.LatLng(51.53870, -0.01652);
-		
-		var newLabelData = {
-		"text_en": textInput.value,
-		"position": [51.53870, -0.01652]
-		}
-		
-		jQuery.ajax({
-			type: "POST",
-			url: "/create/label",
-			contentType: "application/json",
-			data: jQuery.toJSON(newLabelData)
-		}).done(function( msg ) {
-			alert( "Data Saved: " + msg );
-		});
-		
-		
-		addLabelToMap(newLabelData);
-		
 	}
+		    
+	draggableLabel.datakey = labelData.id;
+
+	//create closure for label id
+	//Update the position when we drag
+	(function(refLabel) {
+		google.maps.event.addListener(marker, "dragend",
+		function (mEvent) { 
+			//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
+			updateLabelDatastore({
+				"id": refLabel.datakey, 
+				"position":[refLabel.position.lat(), refLabel.position.lng()]
+			});
+		});
+	})(draggableLabel);
+		    
+	//Set the id on the data fields when we click, so that we can edit the text 
+	(function(refLabel) {
+		google.maps.event.addListener(marker, "mousedown",
+		function (mEvent) { 
+			var labelInputId = document.getElementById('labelInputId');
+			var labelInputText = document.getElementById('labelInputText');
+			labelInputId.value = refLabel.datakey;
+			labelInputText.value = refLabel.text;
+			//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
+			
+		});
+	})(draggableLabel);
+		    
+	window.labels[labelData.id] = draggableLabel;
+}
       
-	//Called while typing into the label text field
-	function updateLabelField() {
-		var textInput = document.getElementById('labelInputText');
-		var labelInputId = document.getElementById('labelInputId');
-		
-		if(!isNaN(labelInputId.value)) {
-			var label = window.labels[labelInputId.value];
-			if(textInput.value !== label.text) {
-				label.set('text', textInput.value);
-				label.set('unsaved', true);
-				label.set('fontColor', 'red'); //to imply that it hasn't been saved
-			}
-		}
+function updateLabelDatastore(labelData) {
+	jQuery.ajax({
+		type: "PUT",
+		url: "/update/label/" + labelData.id,
+		contentType: "application/json",
+		data: jQuery.toJSON(labelData)
+		});
+}
+      
+function addStoredMarkers() {
+
+	jQuery.getJSON( "/labels", 
+		function( json ) {
+		var labelArr = json.labels;
+		for(var l=0; l<labelArr.length; l++) {
+		    addLabelToMap(labelArr[l]);
+		}}
+	);
+	
+	var labelInputText = document.getElementById('labelInputText');
+	google.maps.event.addDomListener(labelInputText, 'keyup', updateLabelField);
+	google.maps.event.addDomListener(labelInputText, 'change', saveLabelField);
+}
+      
+// Normalizes the coords that tiles repeat across the x axis (horizontally)
+// like the standard Google map tiles.
+function getNormalizedCoord(coord, zoom) {
+	var y = coord.y;
+	var x = coord.x;
+
+	// tile range in one direction range is dependent on zoom level
+	// 0 = 1 tile, 1 = 2 tiles, 2 = 4 tiles, 3 = 8 tiles, etc
+	var tileRange = 1 << zoom;
+
+	// don't repeat across y-axis (vertically)
+	if (y < 0 || y >= tileRange) {
+		return null;
+	}
+	if (x < 0 || x >= tileRange) {
+		return null;
+	}
+	return {
+		x: x,
+		y: y
+	};
+}
+      
+      
+function addTextLabel() {
+	if(window.editMode) {
+		return;
+	}
+	var zoomLevelField =  document.getElementById('zoomLevelField');
+	
+	var newLabelData = {
+		"text_en": "New Label",
+		"position": [0, 0],
+		"zoom_level": zoomLevelField.value
 	}
 	
-	//called on hitting return on the label text field
-	function saveLabelField() {
-		var labelInputId = document.getElementById('labelInputId');
-		
-		if(!isNaN(labelInputId.value)) {
-			var label = window.labels[labelInputId.value];
-			label.set('unsaved', false);
-			label.set('fontColor', 'black'); //to imply that it hasn't been saved
-			
-			updateLabelDatastore({
-						"id": label.datakey, 
-						"text_en":label.text
-			});
+	jQuery.ajax({
+		type: "POST",
+		url: "/create/label",
+		contentType: "application/json",
+		data: jQuery.toJSON(newLabelData)
+	}).done(function( msg ) {
+		newLabelData.id = msg.id;
+		addLabelToMap(newLabelData);
+	});
+	
+}
+
+//Called while typing into the label text field
+function updateLabelField() {
+	var textInput = document.getElementById('labelInputText');
+	var labelInputId = document.getElementById('labelInputId');
+	
+	if(!isNaN(labelInputId.value)) {
+		var label = window.labels[labelInputId.value];
+		if(textInput.value !== label.text) {
+			label.set('text', textInput.value);
+			label.set('unsaved', true);
+			label.set('fontColor', 'red'); //to imply that it hasn't been saved
 		}
 	}
+}
+	
+//called on hitting return on the label text field
+function saveLabelField() {
+	var labelInputId = document.getElementById('labelInputId');
+	
+	if(!isNaN(labelInputId.value)) {
+		var label = window.labels[labelInputId.value];
+		label.set('unsaved', false);
+		label.set('fontColor', 'black'); //to imply that it hasn't been saved
+		
+		updateLabelDatastore({
+			"id": label.datakey, 
+			"text_en":label.text
+		});
+	}
+}
       
-	window.editMode = true;
-      google.maps.event.addDomListener(window, 'load', initialize);
-      
+window.editMode = false;
+google.maps.event.addDomListener(window, 'load', initialize);      
     </script>
  </head>
  <body>
@@ -292,7 +266,7 @@
 		<h2>Edit palette</h2>
 		id  <input type="text" id="labelInputId" value="" disabled="disabled" /><br/>
 		label <input type="text" class="loginButtons" id="labelInputText" value="New Label" /><br/>
-		min zoom level <input type="text" class="loginButtons" value="4" />
+		zoom level <input type="text" class="loginButtons" id="zoomLevelField" value="1" />
 		 <button type="button" onclick="addTextLabel();">Add Marker</button>
 	</div>
 	<div id="map-canvas"/>

@@ -78,7 +78,7 @@
 var initialize = function() {
         var mapOptions = {
 		center: new google.maps.LatLng(0, 0.0),
-		zoom: 1,
+		zoom: 2,
 		streetViewControl: false,
 		scaleControl:false, //would love to have this, but can't work out how to set the bounds. By default it assumes the size of the earth.
 		mapTypeControlOptions: {
@@ -118,6 +118,9 @@ var initialize = function() {
             mapOptions);
 	map.mapTypes.set("Survey", drawnSurveyMapType);
 	map.setMapTypeId("Survey");
+	
+	var projection = map.getProjection();//google.maps.MapCanvasProjection
+	
 	window.map = map;
 	window.labels = {};
 	window.photos = {};
@@ -161,7 +164,7 @@ function addMarkers(map) {
 function addLabelToMap(labelData) {
 	var storedLabelPosition = labelData.position;
 	var storedText = labelData.text_en;
-	var latLng = new google.maps.LatLng(storedLabelPosition[0],storedLabelPosition[1]);
+	var latLng = new google.maps.LatLng(storedLabelPosition[0],storedLabelPosition[1], true);
 		
 	var draggableLabel = new MapLabel({
 		text: storedText,
@@ -219,7 +222,7 @@ function addLabelToMap(labelData) {
 function addPhotoToMap(photoData) {
 	var storedPhotoPosition = photoData.position;
 	var photoUrl = photoData.url;
-	var latLng = new google.maps.LatLng(storedPhotoPosition[0],storedPhotoPosition[1]);
+	var latLng = new google.maps.LatLng(storedPhotoPosition[0],storedPhotoPosition[1], true);
 	
 	var photoMarker = new google.maps.Marker({
 		position: latLng,

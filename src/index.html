@@ -43,7 +43,6 @@
 	}
        #mapContent {  
 		display: table-cell;  
-		background: red;
 	}  
 	aside {  
 		display: table-cell;  
@@ -121,6 +120,7 @@ var initialize = function() {
 	map.setMapTypeId("Survey");
 	window.map = map;
 	window.labels = {};
+	window.photos = {};
 	
 	addStoredLabelMarkers();
 	addStoredPhotoMarkers();

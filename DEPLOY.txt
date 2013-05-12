@@ -1,1 +1,1 @@
-~/Dev/google_appengine/appcfg.py update migovec-survey
+~/Dev/google_appengine/appcfg.py update dist/migovec-survey

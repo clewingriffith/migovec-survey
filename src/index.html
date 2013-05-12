@@ -3,36 +3,70 @@
  <head>
 	             <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <style type="text/css">
-      html { height: 100% }
-      body { height: 100%; margin: 0; padding: 0;  }
-      #topbar {
-	height: 70px;
-	min-width: 960px;
-	width: 100%;
-	background: #F1F1F1;
-	border-bottom: 1px solid #DFDFDF;
-      }
-      #topbar img {
-	float: left;
-	margin-left: 10px;
-      }
-      h1 {
-	font-family: arial,sans-serif;
-	font-weight: bold;
-	font-size: 24pt;
-	float: left;
-	color: #606060;
-	margin-bottom: 2px;
-	margin-left: 10px;
-      }
-      #pagebody {
-     	height: 100%;
-	clear:both;
-      }
+	html { height: 100% }
+	body { 
+		height: 100%;
+		margin: 0 auto;
+		padding: 0; 
+		text-font: arial, sans-serif;
+	}
+	header, footer, aside, nav, article {  
+		display: block;  
+	}  
+	#topbar {
+		height: 70px;
+		min-width: 960px;
+		width: 100%;
+		background: #F1F1F1;
+		border-bottom: 1px solid #DFDFDF;
+	}
+	#topbar img {
+		float: left;
+		margin-left: 10px;
+	}
+	h1 {
+		font-family: arial,sans-serif;
+		font-weight: bold;
+		font-size: 24pt;
+		float: left;
+		color: #606060;
+		margin-bottom: 2px;
+		margin-left: 10px;
+	}
+	#pagebody {
+		display: table;
+		width: 100%;
+		height: 100%;
+	}
 	#map-canvas {
-	 height: 100% ; 
+		height: 100% ;  
+	}
+       #mapContent {  
+		display: table-cell;  
+		background: red;
+	}  
+	aside {  
+		display: table-cell;  
+		width: 200px;  
+		height: 100%;
+		padding: 10px;
+		border-right: 1px solid #DFDFDF;
+		background: white;
+	}  
+	#edit-palette {
+		display:block;
+	}
+	#labelControls {
+		margin: 3px;
+		padding: 3px;
+		border: 1px solid #DFDFDF;
+	}
+	#photoControls {
+		margin: 3px;
+		padding: 3px;
+		border: 1px solid #DFDFDF;
+	}
 	
-      }
     </style>
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBt22ZSRQ418n6tFZkK0ghcNy0NyZRamdg&sensor=false">
@@ -88,11 +122,9 @@ var initialize = function() {
 	window.map = map;
 	window.labels = {};
 	
-	//window.alert('blah');
 	addStoredLabelMarkers();
-	//window.alert('blah2');
 	addStoredPhotoMarkers();
-    //window.alert('blah3');
+
 	// bounds of the desired area
 	var allowedBounds = new google.maps.LatLngBounds(
 		new google.maps.LatLng(-90,-180), 
@@ -111,7 +143,6 @@ var initialize = function() {
 	});
 	
 	google.maps.event.addListener(map, 'zoom_changed', function() {
-		//document.//window.alert("zoom = " map.getZoom());
 		var zoomField = document.getElementById('zoomLevelField');
 		zoomField.value=map.getZoom();
 	});
@@ -162,7 +193,6 @@ function addLabelToMap(labelData) {
 		(function(refLabel) {
 			google.maps.event.addListener(marker, "dragend",
 			function (mEvent) { 
-				//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
 				updateLabelDatastore({
 					"id": refLabel.datakey, 
 					"position":[refLabel.position.lat(), refLabel.position.lng()]
@@ -178,7 +208,6 @@ function addLabelToMap(labelData) {
 				var labelInputText = document.getElementById('labelInputText');
 				labelInputId.value = refLabel.datakey;
 				labelInputText.value = refLabel.text;
-				//window.alert("Drag End for " + refLabel.datakey +": " + mEvent.latLng.toString()); 
 				
 			});
 		})(draggableLabel);
@@ -188,7 +217,6 @@ function addLabelToMap(labelData) {
 }
 
 function addPhotoToMap(photoData) {
-	window.alert('adding photo to map');
 	var storedPhotoPosition = photoData.position;
 	var photoUrl = photoData.url;
 	var latLng = new google.maps.LatLng(storedPhotoPosition[0],storedPhotoPosition[1]);
@@ -221,11 +249,21 @@ function addPhotoToMap(photoData) {
 		(function(refMarker) {
 			google.maps.event.addListener(refMarker, "dragend",
 			function (mEvent) { 
-				window.alert("Drag End for " + refMarker.datakey +": " + mEvent.latLng.toString()); 
 				updatePhotoDatastore({
 					"id": refMarker.datakey, 
 					"position":[refMarker.position.lat(), refMarker.position.lng()]
 				});
+			});
+		})(photoMarker);
+		
+		//Set the id on the data fields when we click, so that we can edit the text 
+		(function(refMarker) {
+			google.maps.event.addListener(refMarker, "mousedown",
+			function (mEvent) { 
+				var photoInputId = document.getElementById('photoInputId');
+				var photoInputUrl = document.getElementById('photoInputUrl');
+				photoInputId.value = refMarker.datakey;
+				photoInputUrl.value = refMarker.icon;
 			});
 		})(photoMarker);
 		
@@ -268,7 +306,6 @@ function addStoredLabelMarkers() {
 }
 
 function addStoredPhotoMarkers() {
-	//window.alert('here');
 	jQuery.getJSON( "/photos", 
 		function( json ) {
 		var photoArr = json.photos;
@@ -276,6 +313,11 @@ function addStoredPhotoMarkers() {
 		    addPhotoToMap(photoArr[p]);
 		}}
 	);
+	
+	if(window.editMode) {
+		var photoInputUrl = document.getElementById('photoInputUrl');
+		google.maps.event.addDomListener(photoInputUrl, 'change', savePhotoUrl);
+	}
 }
       
 // Normalizes the coords that tiles repeat across the x axis (horizontally)
@@ -374,6 +416,19 @@ function saveLabelField() {
 		});
 	}
 }
+
+//called on hitting return on the photo Url field
+function savePhotoUrl() {
+	var photoInputId = document.getElementById('photoInputId');
+	var photoInputUrl = document.getElementById('photoInputUrl');
+	
+	if(!isNaN(photoInputId.value)) {
+		updatePhotoDatastore({
+			"id": photoInputId.value, 
+			"url":photoInputUrl.value
+		});
+	}
+}
       
 {% if editMode %}
 window.editMode = true;
@@ -385,24 +440,41 @@ google.maps.event.addDomListener(window, 'load', initialize);
     <title>Migovec Survey</title>
  </head>
  <body>
-	<div id="topbar">
-	<img src="static/icons/miglogo.png" />
-	<h1>Migovec Survey</h1>
-	</div>
-      {% if editMode %}
-        <div id="edit-palette">
-		
-		<h2>Edit palette</h2>
-		id  <input type="text" id="labelInputId" value="" disabled="disabled" /><br/>
-		label <input type="text" class="loginButtons" id="labelInputText" value="New Label" /><br/>
-		zoom level <input type="text" class="loginButtons" id="zoomLevelField" value="2" />
-		 <button type="button" onclick="addTextLabel();">Add Marker</button>
-		photo Url <input type="text" id="photoUrlInput" value="" /><br/>
-		<button type="button" onclick="addNewPhoto();">Add Photo</button>
-	</div>
-      {% endif %}
+	<header>
+		<div id="topbar">
+			<img src="static/icons/miglogo.png" />
+			<h1>Migovec Survey</h1>
+		</div>
+	</header>
 	<div id="pagebody" >
-		<div id="map-canvas"/>
+
+	      {% if editMode %}
+	      <aside>
+		<div id="edit-palette">
+			
+			<h2>Edit palette</h2>
+			<div id="labelControls">
+				<div>Label markers</div>
+				<input type="text" id="labelInputId" value="" disabled="disabled" />
+				label <input type="text" class="loginButtons" id="labelInputText" value="New Label" /><br/>
+				zoom level <input type="text" class="loginButtons" id="zoomLevelField" value="2" />
+				 <button type="button" onclick="addTextLabel();">Add Marker</button>
+			 </div>
+			 <div id="photoControls">
+				 <div>Photo markers</div>
+				 <div>Id <input type="text" id="photoInputId"  value="" disabled="disabled" /></div>
+				<div>Url <input type="text" id="photoInputUrl" value="" /></div>
+				<button type="button" onclick="addNewPhoto();">Add Photo</button>
+			</div>
+		</div>
+		</aside>
+	      {% endif %}
+	      
+		<div id="mapContent">
+		
+					<div id="map-canvas"/>
+			
+		</div>
 	</div>
  </body>
 </html>

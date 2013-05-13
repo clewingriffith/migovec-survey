@@ -20,11 +20,11 @@
       <name>Red Line</name>
       <styleUrl>#redLine</styleUrl>
       <LineString>
-        <altitudeMode>relative</altitudeMode>
+        <altitudeMode>absolute</altitudeMode>
         <coordinates>
-46.25203,13.76397,0
-46.25364,13.76499,0
-46.26071,13.75696,0
+13.76397,46.25203,2000
+13.76499,46.25364,2000
+13.75696,46.26071,2000
         </coordinates>
       </LineString>
     </Placemark>

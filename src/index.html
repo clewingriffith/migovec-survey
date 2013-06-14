@@ -67,6 +67,7 @@
 	}
 	
     </style>
+    <link rel="stylesheet" type="text/css" href="static/gdropdown.css" />
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBt22ZSRQ418n6tFZkK0ghcNy0NyZRamdg&sensor=false">
     </script>
@@ -74,23 +75,23 @@
     <script type="text/javascript" src="static/jquery.json-2.4.min.js"></script>
     <script type="text/javascript" src="static/maplabel-compiled.js"></script>
     <script type="text/javascript" src="static/markerwithlabel_packed.js"></script>
+    <script type="text/javascript" src="static/gdropdown.js"></script>
+    <script type="text/javascript" src="static/fancybox/jquery.fancybox.pack.js"></script>
+	<link rel="stylesheet" type="text/css" href="static/fancybox/jquery.fancybox.css" media="screen" />
+    <script type="text/javascript" src="static/fancybox/helpers/jquery.fancybox-buttons.js"></script>
     <script type="text/javascript">
 var initialize = function() {
         var mapOptions = {
-		center: new google.maps.LatLng(0, 0.0),
+		center: new google.maps.LatLng(46.25203,13.76397),
 		zoom: 2,
 		streetViewControl: false,
 		scaleControl:false, //would love to have this, but can't work out how to set the bounds. By default it assumes the size of the earth.
 		mapTypeControlOptions: {
-			mapTypeIds: ["Survey"]
+			mapTypeIds: ["ExtendedElevation"]
+			//style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
 		}
         };
 	
-	// Bounds for North America
-	//var strictBounds = new google.maps.LatLngBounds(
-	//	new google.maps.LatLng(-20, -180.0), 
-	//	new google.maps.LatLng(20, 180.90)
-	//);
    
 	var calculateTileNum = function(coord, zoom) {
 		return coord.y * (1<<zoom) + coord.x;
@@ -108,22 +109,136 @@ var initialize = function() {
 		tileSize: new google.maps.Size(256,256),
 		maxZoom: 5,
 		minZoom: 0,
-		name: "Drawn Survey"
+		name: "Extended Elevation"
 	};
+	
+	var planSurveyMapTypeOptions = {
+		name: "Plan"
+	}
 	
 	var drawnSurveyMapType =new google.maps.ImageMapType(drawnSurveyMapTypeOptions);
 	
 	
         var map = new google.maps.Map(document.getElementById("map-canvas"),
             mapOptions);
-	map.mapTypes.set("Survey", drawnSurveyMapType);
-	map.setMapTypeId("Survey");
+	map.mapTypes.set("ExtendedElevation", drawnSurveyMapType);
+	map.setMapTypeId("ExtendedElevation");
 	
-	var projection = map.getProjection();//google.maps.MapCanvasProjection
+	window.survexPlanKml = new google.maps.KmlLayer({
+		//url: 'https://www.dropbox.com/s/llmwo0qldtmc9po/plan.kml'
+		url: 'https://raw.github.com/clewingriffith/migovec-survey/master/src/survey/year/2012/survey/SysMig/plan2.kml'
+	});
+	window.survexPlanKml.setMap(map);
+	
+	//~ /// Setup dropdown for Plan View
+	     //~ //start process to set up custom drop down
+        //~ //create the options that respond to click
+        //~ var divOptions = {
+        		//~ gmap: map,
+        		//~ name: 'Drawn Plan',
+        		//~ title: "Show the drawn survey (plan view)",
+        		//~ id: "mapOpt",
+        		//~ action: function(){
+				//~ changeMapOptions({"projection": "PLAN"});
+        		//~ }
+        //~ }
+        //~ var drawnPlanDiv1 = new optionDiv(divOptions);
+        
+        
+        //~ //create the check box items
+	//~ var checkLabels = {
+        		//~ gmap: map,
+        		//~ title: "Show labels ",
+        		//~ id: "labelsCheck",
+        		//~ label: "Labels",
+			//~ checked: true,
+        		//~ action: function(){
+        			//~ alert('you clicked labels');
+        		//~ }        		        		
+        //~ }
+        //~ var labelsCheckBox = new checkBox(checkLabels);
+        
+        //~ var checkPhotos = {
+        		//~ gmap: map,
+        		//~ title: "Show Photos",
+        		//~ id: "photosCheck",
+        		//~ label: "Photos",
+			//~ checked: true,
+        		//~ action: function(){
+				
+					//~ for(var p in window.photos) {
+						//~ var ph = window.photos[p];
+						//~ if(ph.map) {
+							//~ ph.setMap(null);
+						//~ } else {
+							//~ ph.setMap(window.map);
+						//~ }
+					//~ }
+				
+        		//~ }        		        		
+        //~ }
+        //~ var photosCheckBox = new checkBox(checkPhotos);
+	
+        //~ var checkTerrain = {
+        		//~ gmap: map,
+        		//~ title: "Show terrain. ",
+        		//~ id: "terrainCheck",
+        		//~ name: "Terrain",
+        		//~ action: function(){
+				//~ changeMapOptions({"maptype": "terrain"});
+        		//~ }        		        		
+        //~ }
+        //~ var terrainOption = new optionDiv(checkTerrain);
+        
+        //~ var checkSatellite = {
+        		//~ gmap: map,
+        		//~ title: "Show satellite imagery",
+        		//~ id: "satelliteCheck",
+        		//~ name: "Satellite",
+        		//~ action: function(){
+				//~ changeMapOptions({"maptype": "satellite"});
+        		//~ }        		        		
+        //~ }
+        //~ var satelliteOption = new optionDiv(checkSatellite);
+        
+	
+        //~ //create the input box items
+        
+        //~ //possibly add a separator between controls        
+        //~ var sep = new separator();
+        
+        //~ //put them all together to create the drop down       
+        //~ var ddDivOptions = {
+        	//~ items: [drawnPlanDiv1, sep, labelsCheckBox, photosCheckBox, sep, terrainOption, satelliteOption],
+        	//~ id: "myddOptsDiv"        		
+        //~ }
+        //~ //alert(ddDivOptions.items[1]);
+        //~ var dropDownDiv = new dropDownOptionsDiv(ddDivOptions);               
+                
+        //~ var planDropDownOptions = {
+        		//~ gmap: map,
+        		//~ name: 'Plan',
+        		//~ id: 'ddControl',
+        		//~ //title: 'A custom drop down select with mixed elements',
+        		//~ position: google.maps.ControlPosition.TOP_RIGHT,
+        		//~ dropDown: dropDownDiv 
+        //~ }
+        
+        //~ var planDropDown = new dropDownControl(planDropDownOptions);   
+	
+	
+
+	//var projection = map.getProjection();//google.maps.MapCanvasProjection
 	
 	window.map = map;
 	window.labels = {};
 	window.photos = {};
+	window.displayOptions = {
+		"maptype": "satellite",
+		"projection": "ELEVATION"
+	};
+	
+	addPlanDropDown();
 	
 	addStoredLabelMarkers();
 	addStoredPhotoMarkers();
@@ -145,11 +260,174 @@ var initialize = function() {
 		map.panTo(lastValidCenter);
 	});
 	
-	google.maps.event.addListener(map, 'zoom_changed', function() {
-		var zoomField = document.getElementById('zoomLevelField');
-		zoomField.value=map.getZoom();
-	});
+	if(window.editMode) {
+		google.maps.event.addListener(map, 'zoom_changed', function() {
+			var zoomField = document.getElementById('zoomLevelField');
+			zoomField.value=map.getZoom();
+		});
+	}
+	
+	jQuery(".fancybox").fancybox();
 };
+      
+function addExtendedElevationDropDown() {
+        var divOptions = {
+        		gmap: window.map,
+        		name: 'Drawn Extended Elevation',
+        		title: "Show the drawn survey (extended elevation view)",
+        		//id: "mapOpt",
+        		action: function(){
+				changeMapOptions({"projection": "EXTENDED_ELEVATION"});
+        		}
+        }
+	
+	var drawnElevDiv1 = new optionDiv(divOptions);
+	
+	//create the check box items
+	var checkLabels = {
+        		gmap: window.map,
+        		title: "Show labels ",
+        		id: "labelsCheck",
+        		label: "Labels",
+			checked: true,
+        		action: function(){
+        			alert('you clicked labels');
+        		}        		        		
+        }
+        var labelsCheckBox = new checkBox(checkLabels);
+        
+        var checkPhotos = {
+        		gmap: window.map,
+        		title: "Show Photos",
+        		id: "photosCheck",
+        		label: "Photos",
+			checked: true,
+        		action: function(){
+				
+					for(var p in window.photos) {
+						var ph = window.photos[p];
+						if(ph.map) {
+							ph.setMap(null);
+						} else {
+							ph.setMap(window.map);
+						}
+					}
+				
+        		}        		        		
+        }
+        var photosCheckBox = new checkBox(checkPhotos);
+	
+		
+        //create the input box items
+        
+        //possibly add a separator between controls        
+        var sep = new separator();
+        
+        //put them all together to create the drop down       
+        var ddDivOptions = {
+        	items: [drawnPlanDiv1, sep, terrainOption, satelliteOption],
+        	id: "myddOptsDiv"        		
+        }
+        //alert(ddDivOptions.items[1]);
+        var dropDownDiv = new dropDownOptionsDiv(ddDivOptions);               
+                
+        var planDropDownOptions = {
+        		gmap: map,
+        		name: 'Plan',
+        		id: 'ddControl',
+        		//title: 'A custom drop down select with mixed elements',
+        		position: google.maps.ControlPosition.TOP_RIGHT,
+        		dropDown: dropDownDiv 
+        }
+        
+        var planDropDown = new dropDownControl(planDropDownOptions);   
+}
+      
+function addPlanDropDown() {
+	/// Setup dropdown for Plan View
+	     //start process to set up custom drop down
+        //create the options that respond to click
+        var divOptions = {
+        		gmap: window.map,
+        		name: 'Line survey Plan',
+        		title: "Show the survex line survey (plan view)",
+        		id: "mapOpt",
+        		action: function(){
+				changeMapOptions({"projection": "PLAN"});
+        		}
+        }
+        var drawnPlanDiv1 = new optionDiv(divOptions);
+        
+        var checkTerrain = {
+        		gmap: window.map,
+        		title: "Show terrain. ",
+        		id: "terrainCheck",
+        		name: "Terrain",
+        		action: function(){
+				changeMapOptions({"maptype": "terrain"});
+        		}        		        		
+        }
+        var terrainOption = new optionDiv(checkTerrain);
+        
+        var checkSatellite = {
+        		gmap: window.map,
+        		title: "Show satellite imagery",
+        		id: "satelliteCheck",
+        		name: "Satellite",
+        		action: function(){
+				changeMapOptions({"maptype": "satellite"});
+        		}        		        		
+        }
+        var satelliteOption = new optionDiv(checkSatellite);
+        
+	
+        //create the input box items
+        
+        //possibly add a separator between controls        
+        var sep = new separator();
+        
+        //put them all together to create the drop down       
+        var ddDivOptions = {
+        	items: [drawnPlanDiv1, sep, terrainOption, satelliteOption],
+        	id: "myddOptsDiv"        		
+        }
+        //alert(ddDivOptions.items[1]);
+        var dropDownDiv = new dropDownOptionsDiv(ddDivOptions);               
+                
+        var planDropDownOptions = {
+        		gmap: map,
+        		name: 'Plan',
+        		id: 'ddControl',
+        		//title: 'A custom drop down select with mixed elements',
+        		position: google.maps.ControlPosition.TOP_RIGHT,
+        		dropDown: dropDownDiv 
+        }
+        
+        var planDropDown = new dropDownControl(planDropDownOptions);   
+}
+      
+function changeMapOptions(newOptions) {
+	//override the old options with the new ones.
+	for(var opt in newOptions) {
+		window.displayOptions[opt] = newOptions[opt];
+	}
+	if(window.displayOptions["maptype"] == "satellite") {
+		window.map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+	}
+	if(window.displayOptions["maptype"] == "terrain") {
+		window.map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+	}
+	if(window.displayOptions["projection"] == "PLAN") {
+		window.map.setCenter(new google.maps.LatLng(46.25153,13.76266)); 
+		window.map.setZoom(15);
+		//add in the KML file
+		window.survexPlanKml.setMap(window.map);
+		
+	} else {
+		window.map.setZoom(2);
+		window.map.setCenter(new google.maps.LatLng(0,0));
+	}
+}
       
 function addMarkers(map) {        
         var marker = new google.maps.Marker({
@@ -228,20 +506,25 @@ function addPhotoToMap(photoData) {
 		position: latLng,
 		map: window.map,
 		icon: 'static/icons/photo.png',
-		//datakey = photoData.id
+		datakey: photoData.id,
+		photoUrl: photoData.url,
+		photoId: photoData.id,
 		//draggable: window.editMode
 	});
 	
-	photoMarker.datakey = photoData.id;
+	//photoMarker.datakey = photoData.id;
 	
-	var contentString = '<img style="width: auto; max-height: 90%;" src="' + photoUrl + '"/>';
+	//var contentString = '<img style="width: auto; max-height: 90%;" src="' + photoUrl + '"/>';
 
-	var infowindow = new google.maps.InfoWindow({
-		      content: contentString
-	});
+	//var infowindow = new google.maps.InfoWindow({
+//		      content: contentString
+//	});
 
 	google.maps.event.addListener(photoMarker, 'click', function() {
-		    infowindow.open(map,photoMarker);
+		   //infowindow.open(map,photoMarker);
+		   jQuery.fancybox.open(photoMarker.photoUrl);
+		   document.getElementById('photoInputId').value = photoMarker.photoId;
+		   document.getElementById('photoInputUrl').value = photoMarker.photoUrl;
 	});
 	
 	if(window.editMode) {
@@ -265,13 +548,13 @@ function addPhotoToMap(photoData) {
 			function (mEvent) { 
 				var photoInputId = document.getElementById('photoInputId');
 				var photoInputUrl = document.getElementById('photoInputUrl');
-				photoInputId.value = refMarker.datakey;
-				photoInputUrl.value = refMarker.icon;
+				photoInputId.value = refMarker.photoId;
+				photoInputUrl.value = refMarker.photoUrl;
 			});
 		})(photoMarker);
 		
-		window.photos[photoData.id] = photoMarker;
 	}
+	window.photos[photoData.id] = photoMarker;
 }
 
 function updateLabelDatastore(labelData) {
@@ -306,6 +589,7 @@ function addStoredLabelMarkers() {
 		google.maps.event.addDomListener(labelInputText, 'keyup', updateLabelField);
 		google.maps.event.addDomListener(labelInputText, 'change', saveLabelField);
 	}
+
 }
 
 function addStoredPhotoMarkers() {
@@ -378,6 +662,11 @@ function addNewPhoto() {
 		"position": [0, 0],
 	}
 	
+	var photoInputUrl = document.getElementById('photoInputUrl');
+	if(photoInputUrl.value) {
+		newPhotoData.url = photoInputUrl.value;
+	}
+	
 	jQuery.ajax({
 		type: "POST",
 		url: "/create/photo",
@@ -431,6 +720,10 @@ function savePhotoUrl() {
 			"url":photoInputUrl.value
 		});
 	}
+	
+	//update marker
+	var marker = window.photos[photoInputId.value];
+	marker.photoUrl = photoInputUrl.value;
 }
       
 {% if editMode %}
@@ -467,7 +760,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 				 <div>Photo markers</div>
 				 <div>Id <input type="text" id="photoInputId"  value="" disabled="disabled" /></div>
 				<div>Url <input type="text" id="photoInputUrl" value="" /></div>
-				<button type="button" onclick="addNewPhoto();">Add Photo</button>
+				<button type="button" onclick="addNewPhoto();">Add New Photo</button>
 			</div>
 		</div>
 		</aside>

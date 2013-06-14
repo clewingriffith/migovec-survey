@@ -16,16 +16,18 @@
 		  <include name="**/app.yaml" />
 		  <include name="**/*.html" />
 		  <include name="**/*.py" />
-		  <include name="static/*.html" />
-		  <include name="static/*.js" />
-		  <include name="static/icons/*" />
+		  <include name="static/**/*.*" />
 		</fileset>
 		</resources>
 		</copy>
 		<copy todir="dist/migovec-survey/static/survey">
-		<fileset dir="build/tiles">
-		
+			<fileset dir="build/tiles">
 		</fileset>
+		</copy>
+		<copy todir="dist/migovec-survey/static/">
+			<fileset dir="src">
+				<include name="**/*.kml"/>
+			</fileset>
 		</copy>
 	</target>
 	

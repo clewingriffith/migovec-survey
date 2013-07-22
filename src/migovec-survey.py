@@ -6,6 +6,7 @@ import os
 from google.appengine.ext.webapp import template
 
 class Label(db.Model):
+	layer = db.StringProperty(required=True)
 	text_en = db.StringProperty(required=True)
 	position = db.GeoPtProperty(required=True)
 	zoom_level = db.IntegerProperty(required=True)
@@ -20,7 +21,9 @@ class Label(db.Model):
 		}
 		return dic
 		
+		
 class Photo(db.Model):
+	layer = db.StringProperty(required=True)
 	url = db.StringProperty(required=True)
 	position = db.GeoPtProperty(required=True)
 	def asJson(self):
@@ -121,7 +124,7 @@ Create a new label at default position 0,0.
 Returns the JSON representation of the new label, including id field.
 """
 class PostLabel(webapp2.RequestHandler):
-	def post(self):
+	def post(self, layer):
 		try:
 			raw_content = self.request.body
 			print raw_content
@@ -131,7 +134,7 @@ class PostLabel(webapp2.RequestHandler):
 			zoom_level = int(json_data['zoom_level'])
 		except:
 			self.error(400)
-		newLabel = Label(text_en = text_en, position=db.GeoPt(0,0), zoom_level=zoom_level)
+		newLabel = Label(layer = layer, text_en = text_en, position=db.GeoPt(0,0), zoom_level=zoom_level)
 		newLabel.put()
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(newLabel.asJson())
@@ -141,7 +144,7 @@ Create a new photo at default position 0,0.
 Returns the JSON representation of the new label, including id field.
 """
 class PostPhoto(webapp2.RequestHandler):
-	def post(self):
+	def post(self, layer):
 		try:
 			raw_content = self.request.body
 			print raw_content
@@ -151,7 +154,7 @@ class PostPhoto(webapp2.RequestHandler):
 			#url = "http://union.ic.ac.uk/rcc/caving/photo_archive/slovenia/highlights/Clewin_on_Concorde_2004_Photo_by_Jarvist_Frost-mediumquality.JPG";
 		except:
 			self.error(400)
-		newPhoto = Photo(url = url, position=db.GeoPt(0,0))
+		newPhoto = Photo(layer = layer, url = url, position=db.GeoPt(0,0))
 		newPhoto.put()
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(newPhoto.asJson())
@@ -164,8 +167,9 @@ class GetLabel(webapp2.RequestHandler):
 		self.response.out.write(m.asJson())
 
 class GetLabels(webapp2.RequestHandler):
-	def get(self):
-		allLabelsQuery = Label.all()
+	def get(self, layer):
+		#allLabelsQuery = Label.all()
+		allLabelsQuery = db.GqlQuery("SELECT * FROM Label WHERE layer='%s'" % layer)
 		allLabels = allLabelsQuery.run(batch_size=1000)
 		root = {}
 		labels = []
@@ -179,8 +183,9 @@ class GetLabels(webapp2.RequestHandler):
 		self.response.out.write(json.dumps(root))
 
 class GetPhotos(webapp2.RequestHandler):
-	def get(self):
-		allPhotosQuery = Photo.all()
+	def get(self, layer):
+		#allPhotosQuery = Photo.all()
+		allPhotosQuery = db.GqlQuery("SELECT * FROM Photo WHERE layer='%s'" % layer)
 		allPhotos = allPhotosQuery.run(batch_size=1000)
 		root = {}
 		photos = []
@@ -193,12 +198,12 @@ class GetPhotos(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([('/', MainPage), 
 ('/login', Login),
-('/labels',GetLabels), 
-('/photos',GetPhotos), 
+('/labels/(.*)',GetLabels), 
+('/photos/(.*)',GetPhotos), 
 (r'/update/label/(.*)', PutLabel),
 (r'/update/photo/(.*)', PutPhoto),
-('/create/label', PostLabel), 
-('/create/photo', PostPhoto), 
+('/create/label/(.*)', PostLabel), 
+('/create/photo/(.*)', PostPhoto), 
 (r'/get/label/(.*)',GetLabel)],
                               debug=True)
 

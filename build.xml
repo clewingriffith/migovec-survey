@@ -21,7 +21,7 @@
 		</resources>
 		</copy>
 		<copy todir="dist/migovec-survey/static/survey">
-			<fileset dir="build/tiles">
+			<fileset dir="build/survey">
 		</fileset>
 		</copy>
 		<copy todir="dist/migovec-survey/static/">
@@ -42,14 +42,14 @@
 	</target>
 
 
-	
+	<!--
 	<target name="copy-full-surveys">
 		<copy todir="${build.dir}/tiles">
 			<fileset dir="${src.dir}/survey" includes="**/full.png" />
 		</copy>
 	</target>
-	
-	<target name="create-zoom-levels" depends="copy-full-surveys">
+	-->
+<!--	<target name="create-zoom-levels" depends="copy-full-surveys">
 		<script language="javascript">
 <![CDATA[
 			var zoomLevels = project.getProperty("zoom.levels");
@@ -66,11 +66,11 @@
 ]]>
 		</script>
 	</target>
-	
-	
+	-->
+<!--	
 	<macrodef name="generate-scaled-image">
 		<attribute name="zoomlevel"/>
-		<attribute name="pixelsize"/> <!-- eg. 1024  for a 1024x1024 resize -->
+		<attribute name="pixelsize"/> eg. 1024  for a 1024x1024 resize 
 		<sequential>     
 			<echo>   generate-scaled-image @{zoomlevel}</echo>
 			<touch mkdirs="true">
@@ -97,7 +97,8 @@
 			</apply>
 		</sequential>
 	</macrodef>
-	
+	-->
+<!--	
 	<target name="generate-tiles" depends="create-zoom-levels" description="generate the tiles for google maps">
 		<apply executable="convert">
 			<fileset dir="${build.dir}/tiles" includes="**/scaled.png" />
@@ -108,6 +109,10 @@
 			<mapper type="regexp" from="(.*)/scaled.png" to="${build.dir}/tiles/\1/t_%d.png" />
 		</apply>
 	</target>
-
-	
+-->
+	<target name="generate-tiles">
+		<exec executable="python">
+			<arg value="createTiles.py" />
+		</exec>
+	</target>
 </project>

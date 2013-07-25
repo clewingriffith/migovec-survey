@@ -18,7 +18,8 @@
 		min-width: 960px;
 		width: 100%;
 		background: #F1F1F1;
-		border-bottom: 1px solid #DFDFDF;
+		#border-bottom: 2px solid #DFDFDF;
+		display: table-row;
 	}
 	#topbar img {
 		float: left;
@@ -41,7 +42,8 @@
 	#map-canvas {
 		height: 100% ;  
 	}
-       #mapContent {  
+       #mapContent { 
+		border-top: 1px solid #DFDFDF;
 		display: table-cell;  
 	}  
 	aside {  
@@ -134,7 +136,8 @@ var initialize = function() {
 		zoom: 16,
 		maxZoom: 19,
 		streetViewControl: false,
-		scaleControl:true, //would love to have this, but can't work out how to set the bounds. By default it assumes the size of the earth.
+		scaleControl:true,
+		panControl: false,
 		mapTypeId: "coordinate",
 		mapTypeControlOptions: {
 			mapTypeIds: []
@@ -214,7 +217,16 @@ var initialize = function() {
 	  // Now attach the coordinate map type to the map's registry
 	map.mapTypes.set('coordinate', coordinateMapType);
 	////
-	
+	 // Create div for showing copyrights.
+    copyrightNode = document.createElement('div');
+    copyrightNode.id = 'copyright-control';
+    copyrightNode.style.fontSize = '11px';
+    copyrightNode.style.fontFamily = 'Arial, sans-serif';
+    copyrightNode.style.margin = '0 2px 2px 0';
+    copyrightNode.style.whiteSpace = 'nowrap';
+    copyrightNode.index = 0;
+    copyrightNode.innerHTML = "Cave survey &copy; ICCC &amp; JSPDT 1994-2013";
+    map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(copyrightNode);
 
 	
 	//~ /// Setup dropdown for Plan View
@@ -1140,13 +1152,21 @@ google.maps.event.addDomListener(window, 'load', initialize);
  </head>
  <body>
 	<header>
+ {% if editMode %}
+ <div id="topbar">
+			<img src="static/icons/miglogo.png" />
+			<h1>Migovec Survey</h1>
+		</div>
+  {% endif %}
+	</header>
+	
+	<div id="pagebody" >
+	 {% if not editMode %}
 		<div id="topbar">
 			<img src="static/icons/miglogo.png" />
 			<h1>Migovec Survey</h1>
 		</div>
-	</header>
-	<div id="pagebody" >
-
+	{% endif %}
 	      {% if editMode %}
 	      <aside>
 		<div id="edit-palette">

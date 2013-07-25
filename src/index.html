@@ -772,9 +772,9 @@ function addLabelToMap(labelData, projection) {
 		maxZoom:labelData.zoom_level
 	});
 	if(window.displayOptions["projection"] == projection && window.displayOptions["showLabels"]) {
-		draggableLabel.map = window.map;
+		draggableLabel.setMap(window.map);
 	} else {
-		draggableLabel.map = null;
+		draggableLabel.setMap(null);
 	}
 
 	var marker = new google.maps.Marker;
@@ -840,6 +840,12 @@ function addPhotoToMap(photoData, projection) {
 		photoId: photoData.id,
 		//draggable: window.editMode
 	});
+	
+	if(window.displayOptions["projection"] == projection && window.displayOptions["showPhotos"]) {
+		photoMarker.setMap(window.map);
+	} else {
+		photoMarker.setMap(null);
+	}
 	
 	//photoMarker.datakey = photoData.id;
 	

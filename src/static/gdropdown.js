@@ -92,8 +92,8 @@
     		(document.getElementById(options.dropDown.id).style.display == 'block') ? document.getElementById(options.dropDown.id).style.display = 'none' : document.getElementById(options.dropDown.id).style.display = 'block';
     		options.action();
 		  //setTimeout( function(){
-    		//	document.getElementById('myddOptsDiv').style.display = 'none';
-    		//}, 1500);
+    		//	document.getElementById(options.dropDown.id).style.display = 'none';
+    		//}, 2500);
     	  })      	  
       }
      

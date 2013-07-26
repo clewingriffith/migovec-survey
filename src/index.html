@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
  <head>
-	             <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" /> 
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <style type="text/css">
 	html { height: 100% }
 	body { 
@@ -14,21 +15,26 @@
 		display: block;  
 	}  
 	#topbar {
-		height: 70px;
-		min-width: 960px;
+		height: 6%;
+		max-height: 10%;
+		#min-width: 960px;
 		width: 100%;
+		max-width: 100%;
 		background: #F1F1F1;
+		overflow: hidden;
+		white-space:nowrap;
 		#border-bottom: 2px solid #DFDFDF;
 		display: table-row;
 	}
 	#topbar img {
 		float: left;
 		margin-left: 10px;
+		height: 6%;
 	}
 	h1 {
 		font-family: arial,sans-serif;
 		font-weight: bold;
-		font-size: 24pt;
+		font-size: 14pt;
 		float: left;
 		color: #606060;
 		margin-bottom: 2px;
@@ -131,12 +137,21 @@ var initialize = function() {
 		update: function() {}
 	}
 */
+	//google.maps.visualRefresh = true;
+
         var mapOptions = {
 		center: new google.maps.LatLng(46.25203,13.76397),
 		zoom: 16,
 		maxZoom: 19,
 		streetViewControl: false,
 		scaleControl:true,
+		scaleControlOptions: {
+			position: google.maps.ControlPosition.LEFT_BOTTOM,
+		},
+		zoomControl: true,
+		zoomControlOptions: {
+			style: google.maps.ZoomControlStyle.DEFAULT
+		},
 		panControl: false,
 		mapTypeId: "coordinate",
 		mapTypeControlOptions: {
@@ -365,7 +380,9 @@ var initialize = function() {
 		// not valid anymore => return to last valid position
 		map.panTo(lastValidCenter);
 	});
-*/	
+*/		
+ //	options.gmap.controls[options.position]; //.push(container);
+	//google.maps.event.trigger(markers[i], 'click');
 	if(window.editMode) {
 		google.maps.event.addListener(map, 'zoom_changed', function() {
 			var zoomField = document.getElementById('zoomLevelField');
@@ -375,6 +392,8 @@ var initialize = function() {
 	}
 	
 	jQuery(".fancybox").fancybox();
+	
+	
 };
       
 function addExtendedElevationDropDown() {
@@ -446,7 +465,7 @@ function addExtendedElevationDropDown() {
         }
         //alert(ddDivOptions.items[1]);
         var dropDownDiv1 = new dropDownOptionsDiv(ddDivOptions1);               
-            
+    
         var extendedElevationDropDownOptions = {
         		gmap: map,
         		name: 'Elevation',

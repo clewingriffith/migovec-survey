@@ -46,6 +46,7 @@
 		height: 100%;
 	}
 	#map-canvas {
+	        width: 100%;
 		height: 100% ;  
 	}
        #mapContent { 
@@ -148,10 +149,10 @@ var initialize = function() {
 		scaleControlOptions: {
 			position: google.maps.ControlPosition.LEFT_BOTTOM,
 		},
-		zoomControl: true,
+		/*zoomControl: true,
 		zoomControlOptions: {
 			style: google.maps.ZoomControlStyle.DEFAULT
-		},
+		},*/
 		panControl: false,
 		mapTypeId: "coordinate",
 		mapTypeControlOptions: {
@@ -160,7 +161,11 @@ var initialize = function() {
 		}
         };
 	
-	
+	var useragent = navigator.userAgent;
+ if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1 ) {
+    mapOptions.zoomControl = false;
+  } 
+  
 	var planSurveyMapTypeOptions = {
 		name: "Plan"
 	}

@@ -26,6 +26,7 @@ class Photo(db.Model):
 	layer = db.StringProperty(required=True)
 	url = db.StringProperty(required=True)
 	position = db.GeoPtProperty(required=True)
+	caption = db.StringProperty(required=False)
 	def asJson(self):
 		return json.dumps(self.asDict())
 	def asDict(self):
@@ -33,6 +34,7 @@ class Photo(db.Model):
 			'id': self.key().id(),
 			'url':self.url, 
 			'position':(self.position.lat, self.position.lon),
+			'caption':self.caption
 		}
 		return dic
 
@@ -116,6 +118,9 @@ class PutPhoto(webapp2.RequestHandler):
 		if json_data.has_key('position'):
 			(lat,lng) = json_data['position']
 			m.position = db.GeoPt(lat,lng)
+		if json_data.has_key('caption'):
+			newCaption = json_data['caption']
+			m.caption = newCaption
 		m.put()
 
 
@@ -151,10 +156,13 @@ class PostPhoto(webapp2.RequestHandler):
 			json_data = json.loads(raw_content)
 			print json_data
 			url = json_data['url']
+			caption = None
+			if json_data.has_key('caption'):
+				caption = json_data['caption']
 			#url = "http://union.ic.ac.uk/rcc/caving/photo_archive/slovenia/highlights/Clewin_on_Concorde_2004_Photo_by_Jarvist_Frost-mediumquality.JPG";
 		except:
 			self.error(400)
-		newPhoto = Photo(layer = layer, url = url, position=db.GeoPt(0,0))
+		newPhoto = Photo(layer = layer, url = url, position=db.GeoPt(0,0), caption=caption)
 		newPhoto.put()
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(newPhoto.asJson())

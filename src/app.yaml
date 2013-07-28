@@ -1,5 +1,5 @@
 application: migovec-survey
-version: 1
+version: 2
 runtime: python27
 api_version: 1
 threadsafe: true
@@ -14,7 +14,9 @@ handlers:
 - url: /.*
   script: migovec-survey.app
   
-
+- url: /favicon\.ico
+  static_files: static/icons/favicon.ico
+  upload: static/icons/favicon\.ico
   
 libraries:
 - name: jinja2

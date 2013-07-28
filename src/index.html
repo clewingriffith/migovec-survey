@@ -173,12 +173,12 @@ var initialize = function() {
 	
 	var drawnExtendedElevationMapType = new google.maps.ImageMapType({
 		 bounds:  {
-			14: 	 [[8818, 8818], [5811, 5812]],
-			15:    [[17636, 17638], [11624, 11626]],
-			16:    [[35272, 35276], [23248, 24252]],
-			17: [[70544, 70552], [46496, 46504]],
-			18: [[141088, 141104], [92992, 93008]],
-			19: [[282176, 282208], [185984, 186016]]
+			14: 	 [[8818, 8818], [5812, 5812]],
+			15:    [[17636, 17637], [11622, 11625]],
+			16:    [[35272, 35275], [23248, 24251]],
+			17: [[70544, 70551], [46496, 46503]],
+			18: [[141088, 141103], [92992, 93007]],
+			19: [[282176, 282207], [185984, 186015]]
 			},
 		getTileUrl: function(coord, zoom) {
 			if(zoom < 14 || zoom > 19 ||
@@ -196,11 +196,11 @@ var initialize = function() {
 	var drawnPlanSurveyMapType = new google.maps.ImageMapType({
 		 bounds:  {
 			14: 	 [[8818, 8818], [5811, 5812]],
-			15:    [[17636, 17638], [11624, 11626]],
-			16:    [[35272, 35276], [23248, 24252]],
-			17: [[70544, 70552], [46496, 46504]],
-			18: [[141088, 141104], [92992, 93008]],
-			19: [[282176, 282208], [185984, 186016]]
+			15:    [[17636, 17637], [11622, 11625]],
+			16:    [[35272, 35275], [23244, 24251]],
+			17: [[70544, 70551], [46488, 46503]],
+			18: [[141088, 141103], [92976, 93007]],
+			19: [[282176, 282207], [185952, 186015]]
 			},
 		getTileUrl: function(coord, zoom) {
 			if(zoom < 14 || zoom > 19 ||
@@ -396,8 +396,14 @@ var initialize = function() {
 		
 	}
 	
-	jQuery(".fancybox").fancybox();
-	
+	//jQuery(".fancybox").fancybox();
+	jQuery(".fancybox").fancybox({
+		helpers : {
+			title: {
+				type: 'outside'
+			}
+		}
+	});
 	
 };
       
@@ -865,6 +871,7 @@ function addLabelToMap(labelData, projection) {
 function addPhotoToMap(photoData, projection) {
 	var storedPhotoPosition = photoData.position;
 	var photoUrl = photoData.url;
+	var photoCaption = photoData.caption;
 	var latLng = new google.maps.LatLng(storedPhotoPosition[0],storedPhotoPosition[1], true);
 	
 	var photoMarker = new google.maps.Marker({
@@ -874,6 +881,7 @@ function addPhotoToMap(photoData, projection) {
 		datakey: photoData.id,
 		photoUrl: photoData.url,
 		photoId: photoData.id,
+		photoCaption: photoData.caption
 		//draggable: window.editMode
 	});
 	
@@ -893,9 +901,14 @@ function addPhotoToMap(photoData, projection) {
 
 	google.maps.event.addListener(photoMarker, 'click', function() {
 		   //infowindow.open(map,photoMarker);
-		   jQuery.fancybox.open(photoMarker.photoUrl);
+		   jQuery.fancybox.open(
+			{
+			href : photoMarker.photoUrl,
+			title : photoMarker.photoCaption
+			});
 		   document.getElementById('photoInputId').value = photoMarker.photoId;
 		   document.getElementById('photoInputUrl').value = photoMarker.photoUrl;
+		   document.getElementById('photoInputCaption').value = photoMarker.photoCaption;
 	});
 	
 	if(window.editMode) {
@@ -919,8 +932,10 @@ function addPhotoToMap(photoData, projection) {
 			function (mEvent) { 
 				var photoInputId = document.getElementById('photoInputId');
 				var photoInputUrl = document.getElementById('photoInputUrl');
+				var photoInputCaption = document.getElementById('photoInputCaption');
 				photoInputId.value = refMarker.photoId;
 				photoInputUrl.value = refMarker.photoUrl;
+				photoInputCaption.value = refMarker.photoCaption;
 			});
 		})(photoMarker);
 		
@@ -999,6 +1014,9 @@ function addStoredPhotoMarkers() {
 	if(window.editMode) {
 		var photoInputUrl = document.getElementById('photoInputUrl');
 		google.maps.event.addDomListener(photoInputUrl, 'change', savePhotoUrl);
+		
+		var photoCaption = document.getElementById('photoInputCaption');
+		google.maps.event.addDomListener(photoInputCaption, 'change', savePhotoUrl);
 	}
 }
       
@@ -1148,10 +1166,11 @@ function clearLabelAndPhotoField() {
 	photoInputUrl.value = "static/icons/miglogo.png";
 }
 
-//called on hitting return on the photo Url field
+//called on hitting return on the photo Url or caption field
 function savePhotoUrl() {
 	var photoInputId = document.getElementById('photoInputId');
 	var photoInputUrl = document.getElementById('photoInputUrl');
+	var photoInputCaption = document.getElementById('photoInputCaption');
 	
 	if(!isNaN(photoInputId.value)) {
 		updatePhotoDatastore({
@@ -1160,10 +1179,28 @@ function savePhotoUrl() {
 		});
 	}
 	
+	if(typeof(photoInputCaption.value) == 'string' && photoInputCaption.value.length > 0) {
+		updatePhotoDatastore({
+			"id": photoInputId.value, 
+			"caption":photoInputCaption.value
+		});
+	}
+	
+	var projectionType = window.displayOptions["projection"];
+	
 	//update marker
-	var marker = window.photos[photoInputId.value];
+	
+	var marker = null;
+	if(projectionType == "PLAN") {
+	   marker = window.planphotos[photoInputId.value];
+	} else {
+	   marker = window.elevphotos[photoInputId.value];
+	}
+	
 	marker.photoUrl = photoInputUrl.value;
+	marker.photoCaption = photoInputCaption.value;
 }
+
       
 {% if editMode %}
 window.editMode = true;
@@ -1207,6 +1244,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 				 <div>Photo markers</div>
 				 <div>Id <input type="text" id="photoInputId"  value="" disabled="disabled" /></div>
 				<div>Url <input type="text" id="photoInputUrl" value="" /></div>
+				<div>Caption<input type="text" id="photoInputCaption" value="" /></div>
 				<button type="button" onclick="addNewPhoto();">Add New Photo</button>
 			</div>
 		</div>

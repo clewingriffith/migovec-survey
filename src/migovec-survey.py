@@ -41,9 +41,11 @@ class Photo(db.Model):
 class MainPage(webapp2.RequestHandler):
   def get(self):
 	editMode = self.request.get('edit')
+	historyFeature = self.request.get('history')
 	
 	template_values = {
-		'editMode': ("1" == editMode)
+		'editMode': ("1" == editMode),
+		'historyFeature':("1" == historyFeature)
 	}
 
 	self.response.headers['Content-Type'] = 'text/html'

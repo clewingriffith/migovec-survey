@@ -22,7 +22,11 @@
 		</copy>
 		<copy todir="dist/migovec-survey/static/survey">
 			<fileset dir="build/survey">
-		</fileset>
+				<patternset>
+					<include name="**/t_*.png"/>
+				</patternset>
+				<size value="905" when="more"/>
+			</fileset>
 		</copy>
 		<copy todir="dist/migovec-survey/static/">
 			<fileset dir="src">

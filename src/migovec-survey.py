@@ -10,6 +10,7 @@ class Label(db.Model):
 	text_en = db.StringProperty(required=True)
 	position = db.GeoPtProperty(required=True)
 	zoom_level = db.IntegerProperty(required=True)
+	year_discovered = db.IntegerProperty(required=True, default=1976)
 	def asJson(self):
 		return json.dumps(self.asDict())
 	def asDict(self):
@@ -17,7 +18,8 @@ class Label(db.Model):
 			'id': self.key().id(),
 			'text_en':self.text_en, 
 			'position':(self.position.lat, self.position.lon),
-			'zoom_level':self.zoom_level
+			'zoom_level':self.zoom_level,
+			'year_discovered':self.year_discovered
 		}
 		return dic
 		
@@ -94,6 +96,9 @@ class PutLabel(webapp2.RequestHandler):
 		if json_data.has_key('position'):
 			(lat,lng) = json_data['position']
 			m.position = db.GeoPt(lat,lng)
+		if json_data.has_key('year_discovered'):
+			yearDiscovered = json_data['year_discovered']
+			m.year_discovered = int(yearDiscovered)
 		m.put()
 
 
@@ -139,9 +144,12 @@ class PostLabel(webapp2.RequestHandler):
 			print json_data
 			text_en = json_data['text_en']
 			zoom_level = int(json_data['zoom_level'])
+			year_discovered=1976
+			if json_data.has_key('year_discovered'):
+				year_discovered = int(json_data['year_discovered'])
 		except:
 			self.error(400)
-		newLabel = Label(layer = layer, text_en = text_en, position=db.GeoPt(0,0), zoom_level=zoom_level)
+		newLabel = Label(layer = layer, text_en = text_en, position=db.GeoPt(0,0), zoom_level=zoom_level, year_discovered=1976)
 		newLabel.put()
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(newLabel.asJson())

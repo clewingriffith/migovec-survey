@@ -551,9 +551,14 @@ function changeMapOptions(newOptions) {
 		}
 		
 		if(window.displayOptions["showLabels"]) {
-			for(var l in window.elevlabels) {
-				var ll = window.elevlabels[l];
-				ll.setMap(window.map);
+			for(var l in window.planlabels) {
+				var ll = window.planlabels[l];
+				var y1 = ll.year_discovered;
+				var y2 = window.displayOptions["year"];
+				if(ll.year_discovered <= window.displayOptions["year"])
+					ll.setMap(window.map);
+				else
+					ll.setMap(null);
 			}
 		} else {
 			for(var l in window.elevlabels) {

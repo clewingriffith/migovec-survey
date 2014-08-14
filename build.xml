@@ -6,7 +6,7 @@
 	<property name="src.dir" location="src" />
 	<property name="zoom.levels" value="5" />
 
-	<target name="build" description="rebuild any generated files eg. the tiles" depends="generate-tiles">
+	<target name="build" description="rebuild any generated files eg. the tiles" depends="generate-tiles, find-duplicate-tiles, remove-duplicate-tiles">
 	</target>
 
 	<target name="dist" description="copy all artifacts to the dist folder" >
@@ -17,17 +17,22 @@
 		  <include name="**/*.html" />
 		  <include name="**/*.py" />
 		  <include name="static/**/*.*" />
+		  <include name="survey/blank_tile.png" />
+		</fileset>
+		<fileset dir="build">
+		  <include name="*.py" />
 		</fileset>
 		</resources>
 		</copy>
-		<copy todir="dist/migovec-survey/static/survey">
+		
+		<copy todir="dist/migovec-survey/survey">
 			<fileset dir="build/survey">
 				<patternset>
 					<include name="**/t_*.png"/>
 				</patternset>
 				<!-- only copy files bigger than 980 bytes to avoid 
 				using up app engine resources on white tiles -->
-				<size value="980" when="more"/>
+				<!-- no longer needed <size value="980" when="more"/> -->
 			</fileset>
 		</copy>
 		<copy todir="dist/migovec-survey/static/">
@@ -47,9 +52,22 @@
 	<appcfg action="update" war="war" />
 	</target>
 
-	<target name="generate-tiles">
+	<target name="generate-tiles" description="Generate tiles">
 		<exec executable="python">
 			<arg value="createTiles.py" />
 		</exec>
 	</target>
+	
+	<target name="find-duplicate-tiles" description="Find duplicate tiles">
+		<exec executable="python">
+			<arg value="findDuplicateTiles.py" />
+		</exec>
+	</target>
+	
+	<target name="remove-duplicate-tiles" description="remove duplicate tiles">
+		<exec executable="python">
+			<arg value="removeDuplicateTiles.py" />
+		</exec>
+	</target>
+	
 </project>

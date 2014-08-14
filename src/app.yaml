@@ -1,5 +1,5 @@
 application: migovec-survey
-version: 4
+version: 6
 runtime: python27
 api_version: 1
 threadsafe: true
@@ -8,8 +8,8 @@ handlers:
 - url: /static
   static_dir: static
  
-- url: /survey
-  static_dir: survey
+#- url: /survey
+#  static_dir: survey
 
 - url: /.*
   script: migovec-survey.app

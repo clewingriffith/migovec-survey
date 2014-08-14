@@ -165,7 +165,7 @@ function getCoordinateMapType()  {
 					this.bounds[zoom][1][0] > coord.y || coord.y > this.bounds[zoom][1][1]) {
 				return null;
 			}			
-			return ['static/survey/year/' + year + '/survey/SysMig/extendedElevation/t_', zoom, '_', coord.x, '_', coord.y, '.png'].join('');
+			return ['survey/year/' + year + '/survey/SysMig/extendedElevation/t_', zoom, '_', coord.x, '_', coord.y, '.png'].join('');
 		},
 		tileSize: new google.maps.Size(256,256),
 		name: "Extended Elevation"
@@ -189,7 +189,7 @@ function getCoordinateMapType()  {
 					this.bounds[zoom][1][0] > coord.y || coord.y > this.bounds[zoom][1][1]) {
 				return null;
 			}			
-			return ['static/survey/year/'+year+'/survey/SysMig/plan/t_', zoom, '_', coord.x, '_', coord.y, '.png'].join('');
+			return ['survey/year/'+year+'/survey/SysMig/plan/t_', zoom, '_', coord.x, '_', coord.y, '.png'].join('');
 		},
 		tileSize: new google.maps.Size(256,256),
 		name: "Drawn Plan"
@@ -226,12 +226,8 @@ var initialize = function() {
 	}
 	
 	
-
-	window.drawnExtendedElevationMapType = drawnExtendedElevationMapTypeForYear('2012');
-  
-
-	
-	window.drawnPlanSurveyMapType = drawnPlanSurveyMapTypeForYear('2012');
+	window.drawnExtendedElevationMapType = drawnExtendedElevationMapTypeForYear('2014');
+	window.drawnPlanSurveyMapType = drawnPlanSurveyMapTypeForYear('2014');
 	
         var map = new google.maps.Map(document.getElementById("map-canvas"),
             mapOptions);
@@ -257,7 +253,7 @@ var initialize = function() {
     copyrightNode.style.margin = '0 2px 2px 0';
     copyrightNode.style.whiteSpace = 'nowrap';
     copyrightNode.index = 0;
-    copyrightNode.innerHTML = "Cave survey &copy; ICCC &amp; JSPDT 1994-2013";
+    copyrightNode.innerHTML = "Cave survey &copy; ICCC &amp; JSPDT 1994-2014";
     map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(copyrightNode);
 
 	
@@ -273,7 +269,7 @@ var initialize = function() {
 		"showLineSurvey": false,
 		"showLabels": true,
 		"showPhotos": false,
-		"year":2012
+		"year":2014
 	};
 	
 	addPlanDropDown();
@@ -899,17 +895,8 @@ function getCanvasCenterAsLatLng() {
       
 function setYear(year) {
   document.getElementById('currentYear').innerHTML=year;
-  if(
-	year == 1999 ||
-	year == 2000 ||
-	year == 2001 ||
-	year == 2004 ||
-	year == 2005 ||
-	year == 2007 ||
-	year == 2009 ||
-	year == 2010 ||
-	year == 2011 ||
-	year == 2012) {
+  var validYears = [1976,1994,1995,1996,1997,1998,1999,2000,2001,2004,2005,2007,2008,2009,2010,2011,2012,2013,2014];
+  if( validYears.indexOf(year) > 0 ) {
 	changeMapOptions({"year": year});
   }
 }
@@ -1078,8 +1065,8 @@ google.maps.event.addDomListener(window, 'load', initialize);
  <div id="header"><div id="topbar">
 			<img src="static/icons/miglogo.png" />
 			<h1>Migovec Survey</h1>
-			<div id="currentYear">2012</div>
-			<input id="yearSlider" type="range" min="2000" max="2012" value="2012" onchange="setYear(parseInt(this.value))" />
+			<div id="currentYear">2014</div>
+			<input id="yearSlider" type="range" min="1994" max="2014" value="2014" onchange="setYear(parseInt(this.value))" />
 		</div>
 	
 </div>

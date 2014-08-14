@@ -4,6 +4,7 @@ from google.appengine.api import users
 from google.appengine.ext import db
 import os
 from google.appengine.ext.webapp import template
+from duplicate_tile_mapping import tile_mapping
 
 class Label(db.Model):
 	layer = db.StringProperty(required=True)
@@ -213,6 +214,22 @@ class GetPhotos(webapp2.RequestHandler):
 		root['photos'] = photos
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(json.dumps(root))
+		
+class GetSurvey(webapp2.RequestHandler):
+	def get(self, tilepath):
+		self.response.headers['Content-Type'] = 'image/png'
+		self.response.headers['Cache-Control'] = 'max-age=60'
+		request_tile = "survey/"+tilepath
+		print "GetSurvey",request_tile,
+		print "-->",tile_mapping[request_tile]
+		mapped_tilepath = tile_mapping[request_tile]
+		file = open(mapped_tilepath, 'rb')
+		self.response.write(file.read())
+		
+		
+class GetSurvey2(webapp2.RequestHandler):
+	def get(self):
+		print "GetSurvey2",self.route
 
 app = webapp2.WSGIApplication([('/', MainPage), 
 ('/login', Login),
@@ -222,6 +239,8 @@ app = webapp2.WSGIApplication([('/', MainPage),
 (r'/update/photo/(.*)', PutPhoto),
 ('/create/label/(.*)', PostLabel), 
 ('/create/photo/(.*)', PostPhoto), 
-(r'/get/label/(.*)',GetLabel)],
+(r'/get/label/(.*)',GetLabel),
+webapp2.Route(r'/clewin/year/',handler=GetSurvey2),
+(r'/survey/(.*)',GetSurvey)],
                               debug=True)
 

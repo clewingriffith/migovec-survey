@@ -233,6 +233,8 @@ var initialize = function() {
 	});
 
 	jQuery( "#yearSelector" ).change(function() {
+		var newYearIdx = window.validYears.indexOf( this.value);
+		updateYearSelectors(newYearIdx);
 		changeMapOptions({"year": this.value});
 	});
 	

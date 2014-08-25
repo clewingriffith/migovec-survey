@@ -1,1107 +1,199 @@
 <!DOCTYPE html>
 <html>
- <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" /> 
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <style type="text/css">
-	html { height: 100% }
-	body { 
-		height: 100%;
-		max-height: 100%;
-		#min-width: 960px;
-		margin: 0 auto;
-		padding: 0; 
-		text-font: arial, sans-serif;
-		
-	}
+        <head>
+                <meta charset="utf-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" /> 
+                <meta name="apple-mobile-web-app-capable" content="yes" />
+                <title>Migovec Survey</title>
 
-	#topbar {
-		height: 6%;
-		max-height: 10%;
-		min-width: 960px;
-		width: 100%;
-		max-width: 100%;
-		background: #F1F1F1;
-		overflow: hidden;
-		white-space:nowrap;
-		#border-bottom: 2px solid #DFDFDF;
-		position: absolute;
-		left: 0; right: 0; top: 0; bottom: 6%;
-	}
-	#topbar img {
-		float: left;
-		margin-left: 10px;
-		position: absolute;
-		left: 0; top: 0; bottom: 6%; right: 120px;
-		width: 120px;
-	}
-	#yearSlider {
-	position: relative;
-	 float: right;
-	
-	 right 10px;
-	 top: 10px;
-	
-	 width 100px;
-	}
-	#currentYear {
-	position: relative;
-	float: right;
-	}
-	h1 {
-		font-family: arial,sans-serif;
-		font-weight: bold;
-		font-size: 14pt;
-		float: left;
-		color: #606060;
-		margin-bottom: 2px;
-		margin-left: 10px;
-		position: absolute;
-		left: 130px; top: -10;
-	}
-	#pagebody {
-		width: 100%;
-		height: 100%;
-	}
+                <!-- Bootstrap -->
+                <link href="static/bootstrap-3.2.0/bootstrap.min.css" rel="stylesheet"/>
+                <link href="static/css/mig.css" rel="stylesheet"/>
+                <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+                <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+                <!--[if lt IE 9]>
+                <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+                <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+                <![endif]-->
 
-	#map-canvas {
-	        width: 100%;
-		height: 100% ;  
-	}
-       #mapContent { 
-		border-top: 1px solid #DFDFDF;
-		  
-		position: absolute;
-		   {% if editMode %}
-		   left: 200px;
-		   {% else %}
-		   left: 0px;
-		   {% endif %}
-		right: 0; bottom: 0; top:6%;
-	}  
-	aside {  
-		float: left;
-		width: 200px;  
-		height: 100%;
-		padding: 10px;
-		border-right: 1px solid #DFDFDF;
-		background: white;
-		position: absolute;
-		bottom:0; left: 0; right: 200px; top: 6%;
-	}  
-	#edit-palette {
-		display:block;
-	}
-	#labelControls {
-		margin: 3px;
-		padding: 3px;
-		border: 1px solid #DFDFDF;
-	}
-	#photoControls {
-		margin: 3px;
-		padding: 3px;
-		border: 1px solid #DFDFDF;
-	}
-	
-    </style>
-    <link rel="apple-touch-icon" href="static/icons/miglogoIcon.png"/>  
-    <link rel="stylesheet" type="text/css" href="static/gdropdown.css" />
-    <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBt22ZSRQ418n6tFZkK0ghcNy0NyZRamdg&sensor=false">
-    </script>
-    <script type="text/javascript" src="static/jquery-1.9.1.min.js"></script>
-    <script type="text/javascript" src="static/jquery.json-2.4.min.js"></script>
-    <script type="text/javascript" src="static/maplabel-compiled.js"></script>
-    <script type="text/javascript" src="static/markerwithlabel_packed.js"></script>
-    <script type="text/javascript" src="static/gdropdown.js"></script>
-    <script type="text/javascript" src="static/fancybox/jquery.fancybox.pack.js"></script>
-	<link rel="stylesheet" type="text/css" href="static/fancybox/jquery.fancybox.css" media="screen" />
-    <script type="text/javascript" src="static/fancybox/helpers/jquery.fancybox-buttons.js"></script>
-    <script type="text/javascript">
-    
-function getCoordinateMapType()  {
-		//// tile coords
-		function CoordMapType() {
-	}
-
-	CoordMapType.prototype.tileSize = new google.maps.Size(256,256);
-	CoordMapType.prototype.maxZoom = 19;
-
-	CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
-	  var div = ownerDocument.createElement('div');
-	  div.style.width = this.tileSize.width + 'px';
-	  div.style.height = this.tileSize.height + 'px';
-	  div.style.fontSize = '10';
-	  //div.innerHTML = coord;
-	  //div.style.borderStyle = 'solid';
-	  //div.style.borderWidth = '1px';
-	  //div.style.borderColor = '#AAAAAA';
-	  div.style.backgroundColor = '#FFFFFF';
-	  return div;
-	};
-
-	CoordMapType.prototype.name = 'Tile #s';
-	CoordMapType.prototype.alt = 'Tile Coordinate Map Type';
-
-		var coordinateMapType = new CoordMapType();
-			
-	return coordinateMapType;
-}
-    
-	var drawnExtendedElevationMapTypeForYear = function(year)
-	{
-	    return new google.maps.ImageMapType({
-		 bounds:  {
-			14: 	 [[8818, 8818], [5812, 5812]],
-			15:    [[17636, 17637], [11622, 11625]],
-			16:    [[35272, 35275], [23248, 24251]],
-			17: [[70544, 70551], [46496, 46503]],
-			18: [[141088, 141103], [92992, 93007]],
-			19: [[282176, 282207], [185984, 186015]]
-			},
-		getTileUrl: function(coord, zoom) {
-			if(zoom < 14 || zoom > 19 ||
-					this.bounds[zoom][0][0] > coord.x || coord.x > this.bounds[zoom][0][1] ||
-					this.bounds[zoom][1][0] > coord.y || coord.y > this.bounds[zoom][1][1]) {
-				return null;
-			}			
-			return ['survey/year/' + year + '/survey/SysMig/extendedElevation/t_', zoom, '_', coord.x, '_', coord.y, '.png'].join('');
-		},
-		tileSize: new google.maps.Size(256,256),
-		name: "Extended Elevation"
-	   });
-	}    
-	
-	var drawnPlanSurveyMapTypeForYear = function(year)
-	{
-		return new google.maps.ImageMapType({
-		 bounds:  {
-			14: 	 [[8818, 8818], [5811, 5812]],
-			15:    [[17636, 17637], [11622, 11625]],
-			16:    [[35272, 35275], [23244, 24251]],
-			17: [[70544, 70551], [46488, 46503]],
-			18: [[141088, 141103], [92976, 93007]],
-			19: [[282176, 282207], [185952, 186015]]
-			},
-		getTileUrl: function(coord, zoom) {
-			if(zoom < 14 || zoom > 19 ||
-					this.bounds[zoom][0][0] > coord.x || coord.x > this.bounds[zoom][0][1] ||
-					this.bounds[zoom][1][0] > coord.y || coord.y > this.bounds[zoom][1][1]) {
-				return null;
-			}			
-			return ['survey/year/'+year+'/survey/SysMig/plan/t_', zoom, '_', coord.x, '_', coord.y, '.png'].join('');
-		},
-		tileSize: new google.maps.Size(256,256),
-		name: "Drawn Plan"
-		});
-	};
-    
-var initialize = function() {
-	//google.maps.visualRefresh = true;
-
-        var mapOptions = {
-		center: new google.maps.LatLng(46.25203,13.76397),
-		zoom: 16,
-		maxZoom: 19,
-		streetViewControl: false,
-		scaleControl:true,
-		scaleControlOptions: {
-			position: google.maps.ControlPosition.LEFT_BOTTOM,
-		},
-		panControl: false,
-		mapTypeId: "coordinate",
-		mapTypeControlOptions: {
-			mapTypeIds: []
-			//style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
-		}
-        };
-	
-	var useragent = navigator.userAgent;
- if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1 ) {
-    mapOptions.zoomControl = false;
-  } 
-  
-	var planSurveyMapTypeOptions = {
-		name: "Plan"
-	}
-	
-	
-	window.drawnExtendedElevationMapType = drawnExtendedElevationMapTypeForYear('2014');
-	window.drawnPlanSurveyMapType = drawnPlanSurveyMapTypeForYear('2014');
-	
-        var map = new google.maps.Map(document.getElementById("map-canvas"),
-            mapOptions);
-
-	var coordinateMapType = getCoordinateMapType();
-	map.mapTypes.set("coordinate", coordinateMapType);
-	
-	map.overlayMapTypes.push(drawnPlanSurveyMapType);
-	window.survexPlanKml = new google.maps.KmlLayer({
-		//url: 'https://www.dropbox.com/s/llmwo0qldtmc9po/plan.kml'
-		url: 'https://raw.github.com/clewingriffith/migovec-survey/master/src/survey/year/2012/survey/SysMig/plan2.kml'
-	});
-	
-
-	  // Now attach the coordinate map type to the map's registry
-	map.mapTypes.set('coordinate', coordinateMapType);
-	////
-	 // Create div for showing copyrights.
-    copyrightNode = document.createElement('div');
-    copyrightNode.id = 'copyright-control';
-    copyrightNode.style.fontSize = '11px';
-    copyrightNode.style.fontFamily = 'Arial, sans-serif';
-    copyrightNode.style.margin = '0 2px 2px 0';
-    copyrightNode.style.whiteSpace = 'nowrap';
-    copyrightNode.index = 0;
-    copyrightNode.innerHTML = "Cave survey &copy; ICCC &amp; JSPDT 1994-2014";
-    map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(copyrightNode);
-
-	
-	window.map = map;
-	window.planlabels = {};
-	window.elevlabels = {};
-	window.planphotos = {};
-	window.elevphotos = {};
-	window.displayOptions = {
-		"maptype": "coordinate",
-		"projection": "PLAN",
-		"showDrawnSurvey": true,
-		"showLineSurvey": false,
-		"showLabels": true,
-		"showPhotos": false,
-		"year":2014
-	};
-	
-	addPlanDropDown();
-	addExtendedElevationDropDown();
-	
-	addStoredLabelMarkers();
-	addStoredPhotoMarkers();
-
-
-	//google.maps.event.trigger(markers[i], 'click');
-	if(window.editMode) {
-		google.maps.event.addListener(map, 'zoom_changed', function() {
-			var zoomField = document.getElementById('zoomLevelField');
-			zoomField.value=map.getZoom();
-		});
-		
-	}
-	
-	jQuery(".fancybox").fancybox({
-		helpers : {
-			title: {
-				type: 'outside'
-			}
-		}
-	});
-	
-};
-      
-function addExtendedElevationDropDown() {
-	
-	var eeDivOptions = {
-        		gmap: window.map,
-        		label: 'Drawn survey',
-        		title: "Show the drawn survey (extended elevation view)",
-        		id: "mapOpt2",
-			checked: true,
-        		action: function(){
-				this.checked = !this.checked;
-				changeMapOptions({"projection": "EXTENDED_ELEVATION", "showDrawnSurvey":this.checked});
-        		}
-        }
-        var drawnElevDiv1 = new checkBox(eeDivOptions);
-	
-	var divOptions3 = {
-        		gmap: window.map,
-        		label: 'Line survey',
-        		title: "Show the survex line survey (elevation view)",
-        		id: "mapOpt3",
-			checked: false,
-        		action: function(){
-				this.checked = !this.checked;
-				//alert(this.checked);
-				changeMapOptions({"projection": "EXTENDED_ELEVATION", "showLineSurvey":this.checked});
-        		}
-        }
-        var linePlanDiv1 = new checkBox(divOptions3);
-	
-	//create the check box items
-	var checkLabels = {
-        		gmap: window.map,
-        		title: "Show labels ",
-        		id: "labelsCheck",
-        		label: "Labels",
-			checked: true,
-        		action: function(){
-				this.checked = !this.checked;
-				changeMapOptions({"projection": "EXTENDED_ELEVATION", "showLabels":this.checked});
-        		}        		        		
-        }
-        var labelsCheckBox = new checkBox(checkLabels);
-        
-        var checkPhotos = {
-        		gmap: window.map,
-        		title: "Show Photos",
-        		id: "elevphotosCheck",
-        		label: "Photos",
-			checked: false,
-        		action: function(){
-				this.checked = !this.checked;
-				changeMapOptions({"projection": "EXTENDED_ELEVATION", "showPhotos":this.checked});
-        		}        		        		
-        }
-        var photosCheckBox = new checkBox(checkPhotos);
-	
-	
-        //create the input box items
-        
-        //possibly add a separator between controls        
-        var sep = new separator();
-        
-        //put them all together to create the drop down       
-        var ddDivOptions1 = {
-        	items: [drawnElevDiv1, sep, photosCheckBox, labelsCheckBox], //, terrainOption, satelliteOption],
-        	id: "eemyddOptsDiv"
-        }
-        //alert(ddDivOptions.items[1]);
-        var dropDownDiv1 = new dropDownOptionsDiv(ddDivOptions1);               
-    
-        var extendedElevationDropDownOptions = {
-        		gmap: map,
-        		name: 'Elevation',
-        		id: 'eeddControl',
-        		//title: 'A custom drop down select with mixed elements',
-        		position: google.maps.ControlPosition.TOP_RIGHT,
-        		dropDown: dropDownDiv1,
-			action:function() {
-			    changeMapOptions({"projection": "EXTENDED_ELEVATION"});
-			    checkLabels.checked = window.displayOptions["showLabels"];
-			    checkPhotos.checked = window.displayOptions["showPhotos"];
-			}
-        }
-        
-        var extendedElevationDropDown = new dropDownControl(extendedElevationDropDownOptions);  
-}
-      
-function addPlanDropDown() {
-	/// Setup dropdown for Plan View
-	     //start process to set up custom drop down
-        //create the options that respond to click
-        var drawnPlanOptions1 = {
-        		gmap: window.map,
-        		label: 'Drawn survey',
-        		title: "Show the drawn survey (plan view)",
-        		id: "mapOpt1",
-			checked: true,
-        		action: function(){
-				this.checked = !this.checked;
-				changeMapOptions({"projection": "PLAN", "showDrawnSurvey":this.checked});
-        		}
-        }
-        var drawnPlanDiv1 = new checkBox(drawnPlanOptions1);
-        
-	var divOptions2 = {
-        		gmap: window.map,
-        		label: 'Line survey',
-        		title: "Show the survex line survey (plan view)",
-        		id: "mapOpt2",
-			checked: false,
-        		action: function(){
-				this.checked = !this.checked;
-				//alert(this.checked);
-				changeMapOptions({"projection": "PLAN", "showLineSurvey":this.checked});
-        		}
-        }
-        var linePlanDiv1 = new checkBox(divOptions2);
-	
-        var checkTerrain = {
-        		gmap: window.map,
-        		title: "Show terrain. ",
-        		id: "terrainCheck",
-        		name: "Terrain",
-        		action: function(){
-				changeMapOptions({"projection": "PLAN", "maptype": "terrain"});
-        		}        		        		
-        }
-        var terrainOption = new optionDiv(checkTerrain);
-        
-        var checkSatellite = {
-        		gmap: window.map,
-        		title: "Show satellite imagery",
-        		id: "satelliteCheck",
-        		name: "Satellite",
-        		action: function(){
-				changeMapOptions({"projection": "PLAN", "maptype": "satellite"});
-        		}        		        		
-        }
-        var satelliteOption = new optionDiv(checkSatellite);
-        
-	var checkPaper = {
-		gmap:window.map,
-		title:"Paper",
-		id:"paperCheck",
-		name:"Paper",
-		action: function() {
-			changeMapOptions({"projection": "PLAN", "maptype": "coordinate"});
-		}
-	}
-	
-	var paperOption = new optionDiv(checkPaper);
-	
-		//create the check box items
-	var checkLabels = {
-        		gmap: window.map,
-        		title: "Show labels ",
-        		id: "labelsCheck",
-        		label: "Labels",
-			checked: true,
-        		action: function(){
-				this.checked = !this.checked;
-				changeMapOptions({"projection": "PLAN", "showLabels":this.checked});
-        		}        		        		
-        }
-        var labelsCheckBox = new checkBox(checkLabels);
-        
-        var checkPhotos = {
-        		gmap: window.map,
-        		title: "Show Photos",
-        		id: "planphotosCheck",
-        		label: "Photos",
-			checked: false,
-        		action: function(){
-				this.checked = !this.checked;
-				changeMapOptions({"projection": "PLAN", "showPhotos":this.checked});
-        		}        		        		
-        }
-        var photosCheckBox = new checkBox(checkPhotos);
-	
-        //create the input box items
-        
-        //possibly add a separator between controls        
-        var sep = new separator();
-        
-        //put them all together to create the drop down       
-        var ddDivOptions = {
-        	items: [drawnPlanDiv1,linePlanDiv1, sep, labelsCheckBox, photosCheckBox, sep, terrainOption, satelliteOption, paperOption],
-        	id: "myddOptsDiv"
-        }
-        //alert(ddDivOptions.items[1]);
-        var dropDownDiv = new dropDownOptionsDiv(ddDivOptions);               
+                <link rel="apple-touch-icon" href="static/icons/miglogoIcon.png"/>  
                 
-        var planDropDownOptions = {
-        		gmap: map,
-        		name: 'Plan',
-        		id: 'ddControl',
-        		//title: 'A custom drop down select with mixed elements',
-        		position: google.maps.ControlPosition.TOP_RIGHT,
-        		dropDown: dropDownDiv ,
-			action:function() {
-			   changeMapOptions({"projection": "PLAN"});   
-			   checkLabels.checked = window.displayOptions["showLabels"];
-			   checkPhotos.checked = window.displayOptions["showPhotos"];
-			}
-        }
-        
-        var planDropDown = new dropDownControl(planDropDownOptions);   
-}
-      
-function changeMapOptions(newOptions) {
-	//override the old options with the new ones.
-	for(var opt in newOptions) {
-		window.displayOptions[opt] = newOptions[opt];
-	}
-	if(window.displayOptions["maptype"] == "satellite") {
-		window.map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
-	}
-	if(window.displayOptions["maptype"] == "terrain") {
-		//var mapType = window.map.mapTypes.get(google.maps.MapTypeId.TERRAIN);
-		//mapType.maxZoom = 19;
-		window.map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
-	}
-	if(window.displayOptions["maptype"] == "coordinate") {
-		window.map.setMapTypeId("coordinate");
-	}
-	if(window.displayOptions["projection"] == "EXTENDED_ELEVATION") {
-		window.map.setMapTypeId("coordinate");
-		/*if(window.displayOptions["showLineSurvey"]) {
-			window.survexExtendedElevationKml.setMap(window.map);
-		} else {
-			window.survexExtendedElevationKml.setMap(null);
-		}*/
-		if(window.displayOptions["showDrawnSurvey"]) {
-			window.map.overlayMapTypes.clear();
-			window.drawnExtendedElevationMapType=drawnExtendedElevationMapTypeForYear(window.displayOptions["year"]);
-			window.map.overlayMapTypes.push(window.drawnExtendedElevationMapType);
-		} else {
-			map.overlayMapTypes.clear();
-		}
-		
-		if(window.displayOptions["showPhotos"]) {
-			for(var p in window.elevphotos) {
-				var ph = window.elevphotos[p];
-				ph.setMap(window.map);
-			}
-		} else {
-			for(var p in window.elevphotos) {
-				var ph = window.elevphotos[p];
-				ph.setMap(null);
-			}
-		}
-		
-		if(window.displayOptions["showLabels"]) {
-			for(var l in window.planlabels) {
-				var ll = window.planlabels[l];
-				var y1 = ll.year_discovered;
-				var y2 = window.displayOptions["year"];
-				if(ll.year_discovered <= window.displayOptions["year"])
-					ll.setMap(window.map);
-				else
-					ll.setMap(null);
-			}
-		} else {
-			for(var l in window.elevlabels) {
-				var ll = window.elevlabels[l];
-				ll.setMap(null);
-			}
-		}
-		//hide plan labels and photos
-		for(var l in window.planlabels) {
-			var ll = window.planlabels[l];
-			ll.setMap(null);
-		}
-		for(var l in window.planphotos) {
-			var ll = window.planphotos[l];
-			ll.setMap(null);
-		}
-	}
-	if(window.displayOptions["projection"] == "PLAN") {
-		if(window.displayOptions["showLineSurvey"]) {
-			window.survexPlanKml.setMap(window.map);
-		} else {
-			window.survexPlanKml.setMap(null);
-		}
-		if(window.displayOptions["showDrawnSurvey"]) {
-			map.overlayMapTypes.clear();
-			window.drawnPlanSurveyMapType=drawnPlanSurveyMapTypeForYear(window.displayOptions["year"]);
-			map.overlayMapTypes.push(window.drawnPlanSurveyMapType);
-		} else {
-			map.overlayMapTypes.clear();
-		}
-		
-		if(window.displayOptions["showPhotos"]) {
-			for(var p in window.planphotos) {
-				var ph = window.planphotos[p];
-				ph.setMap(window.map);
-			}
-		} else {
-			for(var p in window.planphotos) {
-				var ph = window.planphotos[p];
-				ph.setMap(null);
-			}
-		}
-		
-		if(window.displayOptions["showLabels"]) {
-			for(var l in window.planlabels) {
-				var ll = window.planlabels[l];
-				var y1 = ll.year_discovered;
-				var y2 = window.displayOptions["year"];
-				if(ll.year_discovered <= window.displayOptions["year"])
-					ll.setMap(window.map);
-				else
-					ll.setMap(null);
-			}
-		} else {
-			for(var l in window.planlabels) {
-				var ll = window.planlabels[l];
-				ll.setMap(null);
-			}
-		}
-		//hide elev labels
-		for(var l in window.elevlabels) {
-			var ll = window.elevlabels[l];
-			ll.setMap(null);
-		}
-		for(var l in window.elevphotos) {
-			var ll = window.elevphotos[l];
-			ll.setMap(null);
-		}
-	}
+                <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBt22ZSRQ418n6tFZkK0ghcNy0NyZRamdg&sensor=false"></script>
+                
+                <script type="text/javascript" src="static/jquery-1.11.1/jquery.min.js"></script>
+                <script type="text/javascript" src="static/jquery.json-2.4.min.js"></script>
+                <script type="text/javascript" src="static/maplabel-compiled.js"></script>
+                <script type="text/javascript" src="static/markerwithlabel_packed.js"></script>
+                <script type="text/javascript" src="static/fancybox/jquery.fancybox.pack.js"></script>
+                <link rel="stylesheet" type="text/css" href="static/fancybox/jquery.fancybox.css" media="screen" />
+                <script type="text/javascript" src="static/fancybox/helpers/jquery.fancybox-buttons.js"></script>
+                <script type="text/javascript" src="static/mig.js"></script>
+        </head>
 
-}
-      
-function addMarkers(map) {        
-        var marker = new google.maps.Marker({
-		position:new google.maps.LatLng(0, 0.0),
-		title:"Requires Enlargement",
-		icon:"icons/requires_enlargement_icon.png",
-		draggable:true
-        });
-        marker.setMap(map);
-}
-      
-function addLabelToMap(labelData, projection) {
-	var storedLabelPosition = labelData.position;
-	var storedText = labelData.text_en;
-	var latLng = new google.maps.LatLng(storedLabelPosition[0],storedLabelPosition[1], true);
-		
-	var draggableLabel = new MapLabel({
-		text: storedText,
-		position: latLng,
-		map:window.map,
-		fontSize: 12,
-		align:'left',
-		minZoom:labelData.zoom_level,
-		maxZoom:labelData.zoom_level,
-		year_discovered:labelData.year_discovered
-	});
-	if(window.displayOptions["projection"] == projection && window.displayOptions["showLabels"]) {
-		draggableLabel.setMap(window.map);
-	} else {
-		draggableLabel.setMap(null);
-	}
-
-	var marker = new google.maps.Marker;
-	marker.bindTo('map',draggableLabel);
-	marker.bindTo('position', draggableLabel);
-	marker.setDraggable(window.editMode);
-	if(window.editMode == false) {
-		marker.setIcon({
-			path: google.maps.SymbolPath.CIRCLE,
-			scale: 0
-		});
-	}
-	
-	if(window.editMode) {
-		    
-		draggableLabel.datakey = labelData.id;
-
-		//create closure for label id
-		//Update the position when we drag
-		(function(refLabel) {
-			google.maps.event.addListener(marker, "dragend",
-			function (mEvent) { 
-				updateLabelDatastore({
-					"id": refLabel.datakey, 
-					"position":[refLabel.position.lat(), refLabel.position.lng()]
-				});
-			});
-		})(draggableLabel);
-			    
-		//Set the id on the data fields when we click, so that we can edit the text 
-		(function(refLabel) {
-			google.maps.event.addListener(marker, "mousedown",
-			function (mEvent) { 
-				var labelInputId = document.getElementById('labelInputId');
-				var labelInputText = document.getElementById('labelInputText');
-				var labelInputYearDiscovered = document.getElementById('labelInputYearDiscovered');
-				labelInputId.value = refLabel.datakey;
-				labelInputText.value = refLabel.text;
-				labelInputYearDiscovered.value = refLabel.year_discovered;
-			});
-			
-		})(draggableLabel);
-	}
-	
-	if(projection == "PLAN") {
-			window.planlabels[labelData.id] = draggableLabel;
-	} else {
-			window.elevlabels[labelData.id] = draggableLabel;
-	}
-	
-}
-
-function addPhotoToMap(photoData, projection) {
-	var storedPhotoPosition = photoData.position;
-	var photoUrl = photoData.url;
-	var photoCaption = photoData.caption;
-	var latLng = new google.maps.LatLng(storedPhotoPosition[0],storedPhotoPosition[1], true);
-	
-	var photoMarker = new google.maps.Marker({
-		position: latLng,
-		map: window.map,
-		icon: 'static/icons/photo.png',
-		datakey: photoData.id,
-		photoUrl: photoData.url,
-		photoId: photoData.id,
-		photoCaption: photoData.caption
-		//draggable: window.editMode
-	});
-	
-	if(window.displayOptions["projection"] == projection && window.displayOptions["showPhotos"]) {
-		photoMarker.setMap(window.map);
-	} else {
-		photoMarker.setMap(null);
-	}
-	
-
-
-	google.maps.event.addListener(photoMarker, 'click', function() {
-		   //infowindow.open(map,photoMarker);
-		   jQuery.fancybox.open(
-			{
-			href : photoMarker.photoUrl,
-			title : photoMarker.photoCaption
-			});
-		   document.getElementById('photoInputId').value = photoMarker.photoId;
-		   document.getElementById('photoInputUrl').value = photoMarker.photoUrl;
-		   document.getElementById('photoInputCaption').value = photoMarker.photoCaption;
-		
-	});
-	
-	if(window.editMode) {
-		photoMarker.setDraggable(true);
-		
-		//create closure for label id
-		//Update the position when we drag
-		(function(refMarker) {
-			google.maps.event.addListener(refMarker, "dragend",
-			function (mEvent) { 
-				updatePhotoDatastore({
-					"id": refMarker.datakey, 
-					"position":[refMarker.position.lat(), refMarker.position.lng()]
-				});
-			});
-		})(photoMarker);
-		
-		//Set the id on the data fields when we click, so that we can edit the text 
-		(function(refMarker) {
-			google.maps.event.addListener(refMarker, "mousedown",
-			function (mEvent) { 
-				var photoInputId = document.getElementById('photoInputId');
-				var photoInputUrl = document.getElementById('photoInputUrl');
-				var photoInputCaption = document.getElementById('photoInputCaption');
-				photoInputId.value = refMarker.photoId;
-				photoInputUrl.value = refMarker.photoUrl;
-				photoInputCaption.value = refMarker.photoCaption;
-			});
-		})(photoMarker);
-		
-	}
-	
-	if(projection == "PLAN") {
-			window.planphotos[photoMarker.photoId] = photoMarker;
-	} else {
-			window.elevphotos[photoMarker.photoId] = photoMarker;
-	}
-}
-
-function updateLabelDatastore(labelData) {
-	updateDatastore("label", labelData);
-}
-
-function updatePhotoDatastore(labelData) {
-	updateDatastore("photo", labelData);
-}
-
-function updateDatastore(type, data) {
-	jQuery.ajax({
-		type: "PUT",
-		url: "/update/" + type + "/" + data.id,
-		contentType: "application/json",
-		data: jQuery.toJSON(data)
-		});
-}
-      
-function addStoredLabelMarkers() {
-
-	//var projectionType = window.displayOptions["projection"];
-
-	jQuery.getJSON( "/labels/PLAN", 
-		function( json ) {
-		var labelArr = json.labels;
-		for(var l=0; l<labelArr.length; l++) {
-		    addLabelToMap(labelArr[l], "PLAN");
-		}}
-	);
-	
-	jQuery.getJSON( "/labels/EXTENDED_ELEVATION", 
-		function( json ) {
-		var labelArr = json.labels;
-		for(var l=0; l<labelArr.length; l++) {
-		    addLabelToMap(labelArr[l], "EXTENDED_ELEVATION");
-		}}
-	);
-	
-	if(window.editMode) {
-		var labelInputText = document.getElementById('labelInputText');
-		google.maps.event.addListener(window.map, 'click', clearLabelAndPhotoField);
-		google.maps.event.addDomListener(labelInputText, 'keyup', updateLabelField);
-		google.maps.event.addDomListener(labelInputText, 'change', saveLabelField);
-		var labelInputYearDiscovered = document.getElementById('labelInputYearDiscovered');
-		google.maps.event.addDomListener(labelInputYearDiscovered, 'change', saveLabelField);
-                google.maps.event.addDomListener(labelInputYearDiscovered, 'input', saveLabelField);
-		
-	}
-
-}
-
-function addStoredPhotoMarkers() {
-	jQuery.getJSON( "/photos/PLAN", 
-		function( json ) {
-		var photoArr = json.photos;
-		for(var p=0; p<photoArr.length; p++) {
-		    addPhotoToMap(photoArr[p], "PLAN");
-		}}
-	);
-	
-	jQuery.getJSON( "/photos/EXTENDED_ELEVATION", 
-		function( json ) {
-		var photoArr = json.photos;
-		for(var p=0; p<photoArr.length; p++) {
-		    addPhotoToMap(photoArr[p], "EXTENDED_ELEVATION");
-		}}
-	);
-	
-	if(window.editMode) {
-		var photoInputUrl = document.getElementById('photoInputUrl');
-		google.maps.event.addDomListener(photoInputUrl, 'change', savePhotoUrl);
-		
-		var photoCaption = document.getElementById('photoInputCaption');
-		google.maps.event.addDomListener(photoInputCaption, 'change', savePhotoUrl);
-	}
-}
-      
-// Normalizes the coords that tiles repeat across the x axis (horizontally)
-// like the standard Google map tiles.
-function getNormalizedCoord(coord, zoom) {
-	var y = coord.y;
-	var x = coord.x;
-
-	// tile range in one direction range is dependent on zoom level
-	// 0 = 1 tile, 1 = 2 tiles, 2 = 4 tiles, 3 = 8 tiles, etc
-	var tileRange = 1 << zoom;
-
-	// don't repeat across y-axis (vertically)
-	if (y < 0 || y >= tileRange) {
-		return null;
-	}
-	if (x < 0 || x >= tileRange) {
-		return null;
-	}
-	return {
-		x: x,
-		y: y
-	};
-}
-      
-function getCanvasCenterAsLatLng() {
-	var canvas = document.getElementById("map-canvas");
-	var overlay = new google.maps.OverlayView();
-	overlay.draw = function() {};
-	overlay.setMap(window.map);
-	
-	var projection = overlay.getProjection();
-	var point=new google.maps.Point(0.5*(jQuery(canvas).width()),0.5*(jQuery(canvas).height()));
-	var latlng = projection.fromContainerPixelToLatLng(point);
-	return latlng;
-}
-      
-function setYear(year) {
-  document.getElementById('currentYear').innerHTML=year;
-  var validYears = [1976,1994,1995,1996,1997,1998,1999,2000,2001,2004,2005,2007,2008,2009,2010,2011,2012,2013,2014];
-  if( validYears.indexOf(year) > 0 ) {
-	changeMapOptions({"year": year});
-  }
-}
-
-function addTextLabel() {
-	//if(window.editMode == false) {
-	//	return;
-	//}
-	var zoomLevelField =  document.getElementById('zoomLevelField');
-	var textInput = document.getElementById('labelInputText');
-	
-	var latlng = getCanvasCenterAsLatLng();
-	
-	var newLabelData = {
-		"text_en": textInput.value,
-		"position": [latlng.lat(), latlng.lng()],
-		"zoom_level": zoomLevelField.value
-	}
-	
-	var projectionType = window.displayOptions["projection"];
-	
-	jQuery.ajax({
-		type: "POST",
-		url: "/create/label/"+ projectionType,
-		contentType: "application/json",
-		data: jQuery.toJSON(newLabelData)
-	}).done(function( msg ) {
-		newLabelData.id = msg.id;
-		addLabelToMap(newLabelData, projectionType);
-	});
-	
-}
-
-function addNewPhoto() {
-
-	var latlng = getCanvasCenterAsLatLng();
-
-	var newPhotoData = {
-		"url": "static/icons/miglogo.png",
-		"position": [latlng.lat(), latlng.lng()],
-	}
-	
-	var photoInputUrl = document.getElementById('photoInputUrl');
-	if(photoInputUrl.value) {
-		newPhotoData.url = photoInputUrl.value;
-	}
-	
-	var projectionType = window.displayOptions["projection"];
-	
-	jQuery.ajax({
-		type: "POST",
-		url: "/create/photo/" + projectionType,
-		contentType: "application/json",
-		data: jQuery.toJSON(newPhotoData)
-	}).done(function( msg ) {
-		newPhotoData.id = msg.id;
-		addPhotoToMap(newPhotoData, projectionType);
-	});
-}
-
-//Called while typing into the label text field
-function updateLabelField() {
-	var textInput = document.getElementById('labelInputText');
-	var labelInputId = document.getElementById('labelInputId');
-       
-	if(labelInputId.value) {
-		var label;
-		if(window.displayOptions["projection"] == "PLAN") {
-			label = window.planlabels[labelInputId.value];
-		} else {
-			label = window.elevlabels[labelInputId.value];
-		}
-		
-		if(textInput.value !== label.text) {
-			label.set('text', textInput.value);
-			label.set('unsaved', true);
-			label.set('fontColor', 'red'); //to imply that it hasn't been saved
-		}
-	}
-}
-	
-//called on hitting return on the label text field
-function saveLabelField() {
-	var labelInputId = document.getElementById('labelInputId');
-	var labelInputYearDiscovered = document.getElementById('labelInputYearDiscovered')
-	if(!isNaN(labelInputId.value)) {
-		var label;
-		if(window.displayOptions["projection"] == "PLAN") {
-			label = window.planlabels[labelInputId.value];
-		} else {
-			label = window.elevlabels[labelInputId.value];
-		}
-		
-		label.set('unsaved', false);
-		label.set('fontColor', 'black'); //to show that it has been saved
-		label.set('year_discovered', parseInt(labelInputYearDiscovered.value));
-		
-		updateLabelDatastore({
-			"id": label.datakey, 
-			"text_en":label.text,
-			"year_discovered":labelInputYearDiscovered.value
-		});
-	}
-	changeMapOptions({});
-}
-
-//remove the ids and replace label name with default
-function clearLabelAndPhotoField() {
-	var labelInputId = document.getElementById('labelInputId');
-	labelInputId.value = "";
-	var labelInputText = document.getElementById('labelInputText');
-	labelInputText = "New Label";
-	var photoInputId = document.getElementById('photoInputId');
-	photoInputId.value = "";
-	var photoInputUrl = document.getElementById('photoInputUrl');
-	photoInputUrl.value = "static/icons/miglogo.png";
-}
-
-//called on hitting return on the photo Url or caption field
-function savePhotoUrl() {
-	var photoInputId = document.getElementById('photoInputId');
-	var photoInputUrl = document.getElementById('photoInputUrl');
-	var photoInputCaption = document.getElementById('photoInputCaption');
-	
-	if(!isNaN(photoInputId.value)) {
-		updatePhotoDatastore({
-			"id": photoInputId.value, 
-			"url":photoInputUrl.value
-		});
-	}
-	
-	if(typeof(photoInputCaption.value) == 'string' && photoInputCaption.value.length > 0) {
-		updatePhotoDatastore({
-			"id": photoInputId.value, 
-			"caption":photoInputCaption.value
-		});
-	}
-	
-	var projectionType = window.displayOptions["projection"];
-	
-	//update marker
-	
-	var marker = null;
-	if(projectionType == "PLAN") {
-	   marker = window.planphotos[photoInputId.value];
-	} else {
-	   marker = window.elevphotos[photoInputId.value];
-	}
-	
-	marker.photoUrl = photoInputUrl.value;
-	marker.photoCaption = photoInputCaption.value;
-}
-
-      
-{% if editMode %}
-window.editMode = true;
-{% else %}
-window.editMode = false;
-{% endif %}
-google.maps.event.addDomListener(window, 'load', initialize);      
-    </script>
-    <title>Migovec Survey</title>
- </head>
  <body>
-<div id="pagebody" >
- <div id="header"><div id="topbar">
-			<img src="static/icons/miglogo.png" />
-			<h1>Migovec Survey</h1>
-			<div id="currentYear">2014</div>
-			<input id="yearSlider" type="range" min="1994" max="2014" value="2014" onchange="setYear(parseInt(this.value))" />
-		</div>
-	
-</div>
-  {% if editMode %}
-     <aside>
-		<div id="edit-palette">
+             <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <!--    <script src="static/jquery-1.11.1/jquery.min.js"></script>-->
+            <!-- Include all compiled plugins (below), or include individual files as needed -->
+            <script src="static/bootstrap-3.2.0/bootstrap.min.js"></script>
+            <script src="static/jquery-ui-1.11.1/jquery-ui.js"></script>
+            
+	     
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+                <div class="container-fluid">
+                        <!-- Brand and toggle get grouped for better mobile display -->
+                        <div class="navbar-header">
+                                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                                        <span class="sr-only">Toggle navigation</span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                </button>
+                                <a class="navbar-brand" href="#"><img id="miglogo" src="static/icons/miglogo.png"><span class="visible-xs-inline">Migovec Survey</span><span class="hidden-xs">Migovec Cave Survey</span></a> 
+                        </div><!-- /.navbar-header -->
+                        <!-- Collect the nav links, forms, and other content for toggling -->
 			
-			<h2>Edit palette</h2>
-			<div id="labelControls">
-				<div>Label markers</div>
-				<input type="text" id="labelInputId" value="" disabled="disabled" />
-				label <input type="text" class="loginButtons" id="labelInputText" value="New Label" /><br/>
-				zoom level <input type="text" class="loginButtons" id="zoomLevelField" value="16" />
-				year discovered <input type="number" id="labelInputYearDiscovered" value="1976" />
-				 <button type="button" onclick="addTextLabel();">Add Marker</button>
-			 </div>
-			 <div id="photoControls">
-				 <div>Photo markers</div>
-				 <div>Id <input type="text" id="photoInputId"  value="" disabled="disabled" /></div>
-				<div>Url <input type="text" id="photoInputUrl" value="" /></div>
-				<div>Caption<input type="text" id="photoInputCaption" value="" /></div>
-				<button type="button" onclick="addNewPhoto();">Add New Photo</button>
+		
+			
+
+				        <div class="col-md-4 col-lg-4 hidden-xs hidden-sm">
+				
+					
+					     <!--   <form class="navbar-form navbar-right" role="search">
+						
+						        <div class="nav input-group">
+								<p>Year</p>
+							</div>
+							 <div class="input-group">
+								<select id="yearSelector">
+								  <option value="1976">1976</option>
+								  <option value="1994">1994</option>
+								  <option value="1995">1995</option>
+								  <option value="1996">1996</option>
+								</select>
+								
+							</div>
+							<div class="input-group">
+							<a href="#" class="btn btn-error">&laquo;</a>
+							<a href="#" class="btn btn-error" disabled="disabled">&raquo;</a>
+							</div>
+					        </form> -->
+					
+						<div class="input-group navbar-right">
+						<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+								<select id="yearSelector" class="form-control">
+								  <option value="1976">1976</option>
+								  <option value="1994">1994</option>
+								  <option value="1995">1995</option>
+								  <option value="1996">1996</option>
+								  <option value="1997">1997</option>
+								  <option value="1998">1998</option>
+								  <option value="1999">1999</option>
+								  <option value="2000">2000</option>
+								  <option value="2001">2001</option>
+								  <option value="2004">2004</option>
+								  <option value="2005">2005</option>
+								  <option value="2007">2007</option>
+								  <option value="2008">2008</option>
+								  <option value="2009">2009</option>
+								  <option value="2010">2010</option>
+								  <option value="2011">2011</option>
+								  <option value="2012">2012</option>
+								  <option value="2013">2013</option>
+								  <option value="2014" selected="selected">2014</option>
+								</select>
+								
+							</div>
+							<a id="previousYear" href="#" class="btn btn-error">&laquo;</a>
+							<a id="nextYear" href="#" class="btn btn-error" disabled="disabled">&raquo;</a>
+						</form>
+							</div>
+						
+								<p class="navbar-text navbar-right">Year</p>
+								
+				        </div>
+
+					
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+							
+                                <ul class="nav navbar-nav navbar-right">
+				
+                                        <li class="active"><a href="#" id="plan" class="btn">Plan</a></li>
+                                        <li id="elevationItem"><a href="#" id="elevation" data-toggle="button">Elevation</a></li>
+                                        <li class="dropdown">
+                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Options<span class="caret"></span></a>
+                                                <ul class="dropdown-menu" role="menu">
+                                                    <li class="active"><a href="#" id="labels">Labels</a></li>
+                                                    <li><a href="#" id="photos">Photos</a></li>
+                                                    <li class="divider"></li>
+                                                    <li role="presentation" class="dropdown-header">Background</li>
+                                                    <li class="active"><a href="#" id="satellite">Satellite</a></li>
+                                                    <li><a href="#" id="terrain">Terrain</a></li>
+                                                    <li><a href="#" id="paper">Paper</a></li>
+                                                </ul>
+                                        </li>
+                                </ul>
+                        </div><!-- /.navbar-collapse -->
+              </div><!-- /.container-fluid -->
+      </nav>
+      
+      
+      <div id="mainpage" class="fill">
+      <div class="row fill">
+      	<div id="editPanel" class="col-md-3 hidden">
+		<div class="visible-lg">
+			<div id="edit-palette">
+				<h3>Edit palette</h3>
+				<form role="form">
+				<fieldset id="labelFieldSet">
+				<h4>Labels</h4>
+				<div class="form-group">
+					<label for="labelInputId">label id</label>
+					 <input type="number" class="form-control" id="labelInputId" disabled="disabled"  readonly="readonly" placeholder="id" />
+				</div>
+				<div class="form-group">
+					 <label for="labelInputText">label</label>
+					 <input type="text" class="form-control" id="labelInputText"  placeholder="New Label" />
+				</div>	 
+				<div class="form-group">
+					 <label for="zoomLevelField">zoom level</label>
+					 <input type="number" class="form-control" id="zoomLevelField" value="16" />
+				</div>
+				<div class="form-group">
+					 <label for="labelInputYearDiscovered">zoom level</label>
+					 <input type="year" class="form-control" id="labelInputYearDiscovered" value="1976" />
+				</div>
+				<button type="button" class="btn btn-primary" onclick="addTextLabel();">Add Label</button>  <!-- on click="addTextLabel()" -->
+				</fieldset>
+				</form> 
+				
+				<form role="form">
+					<fieldset id="photoFieldSet" disabled="disabled">
+					<h4>Photos</h4>
+					<div class="form-group">
+						<label for="photoInputId">label id</label>
+						<input type="number" class="form-control" id="photoInputId" disabled="disabled"  readonly="readonly" placeholder="id" />
+					</div>
+					<div class="form-group">
+						<label for="photoInputUrl">Url</label>
+						<input type="text" class="form-control" id="photoInputUrl"  placeholder="Url" />
+					</div>	
+					<div class="form-group">
+						<label for="photoInputCaption">Caption</label>
+						<input type="text" class="form-control" id="photoInputCaption"  placeholder="" />
+					</div>	
+					<button type="button" class="btn btn-primary" onclick="addNewPhoto();">Add Photo</button>  <!-- on click="addNewPhoto()" -->
+					</fieldset>
+				</form>
 			</div>
 		</div>
-	</aside>
-	    {% endif %}	
-	<div id="mapContent">
-		<div id="map-canvas"/>
+	</div>	
+	<div id="mapPanel" class="fill">
+		 <div id="map-canvas"/>
 	</div>
 
+</div>
 </div>
 
  </body>

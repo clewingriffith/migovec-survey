@@ -14,7 +14,7 @@ if __name__ == '__main__':
 	
 	for source,dest in duplicate_tile_mapping.tile_mapping.items():
 		if source != dest:
-			os.remove(source)
+			os.remove("build/"+source)
 			removal_count += 1
 			
 	print "Removed",removal_count,"files."

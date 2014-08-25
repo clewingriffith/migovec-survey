@@ -145,12 +145,13 @@ class PostLabel(webapp2.RequestHandler):
 			print json_data
 			text_en = json_data['text_en']
 			zoom_level = int(json_data['zoom_level'])
+			posLat,posLng = json_data['position']
 			year_discovered=1976
 			if json_data.has_key('year_discovered'):
 				year_discovered = int(json_data['year_discovered'])
 		except:
 			self.error(400)
-		newLabel = Label(layer = layer, text_en = text_en, position=db.GeoPt(0,0), zoom_level=zoom_level, year_discovered=1976)
+		newLabel = Label(layer = layer, text_en = text_en, position=db.GeoPt(posLat,posLng), zoom_level=zoom_level, year_discovered=year_discovered)
 		newLabel.put()
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(newLabel.asJson())

@@ -93,7 +93,7 @@ function getCoordinateMapType()  {
 var initialize = function() {
 	//google.maps.visualRefresh = true;
 
-	window.validYears = ["1976","1994","1995","1996","1997","1998","1999","2000","2001","2004","2005","2007","2008","2009","2010","2011","2012","2013","2014"];
+	window.validYears = ["1976","1994","1995","1996","1997","1998","1999","2000","2001","2003","2004","2005","2007","2008","2009","2010","2011","2012","2013","2014"];
 	
         var mapOptions = {
 		center: new google.maps.LatLng(46.25203,13.76397),

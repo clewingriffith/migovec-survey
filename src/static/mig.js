@@ -817,7 +817,7 @@ function addStoredLabelMarkers() {
 		}}
 	);
 	
-	if(window.editMode) {
+	/*if(window.editMode) {
 		var labelInputText = document.getElementById('labelInputText');
 		google.maps.event.addListener(window.map, 'click', clearLabelAndPhotoField);
 		google.maps.event.addDomListener(labelInputText, 'keyup', updateLabelField);
@@ -826,7 +826,7 @@ function addStoredLabelMarkers() {
 		google.maps.event.addDomListener(labelInputYearDiscovered, 'change', saveLabelField);
                 google.maps.event.addDomListener(labelInputYearDiscovered, 'input', saveLabelField);
 		
-	}
+	}*/
 
 }
 
@@ -981,8 +981,9 @@ function updateLabelField() {
 //called on hitting return on the label text field
 function saveLabelField() {
 	var labelInputId = document.getElementById('labelInputId');
-	var labelInputYearDiscovered = document.getElementById('labelInputYearDiscovered')
-	var labelInputText = document.getElementById('labelInputText')
+	var labelInputYearDiscovered = document.getElementById('labelInputYearDiscovered');
+	var labelInputText = document.getElementById('labelInputText');
+	var zoomLevelField =  document.getElementById('zoomLevelField');
 	if(!isNaN(labelInputId.value)) {
 		var label;
 		if(window.displayOptions["projection"] == "PLAN") {
@@ -995,10 +996,13 @@ function saveLabelField() {
 		label.set('fontColor', 'black'); //to show that it has been saved
 		label.set('year_discovered', parseInt(labelInputYearDiscovered.value));
 		label.set('text', labelInputText.value);
+		label.set('minZoom', zoomLevelField.value);
+		label.set('maxZoom', zoomLevelField.value);
 		updateLabelDatastore({
 			"id": label.datakey, 
 			"text_en":labelInputText.value,
-			"year_discovered":labelInputYearDiscovered.value
+			"year_discovered":labelInputYearDiscovered.value,
+			"zoom_level":zoomLevelField.value
 		});
 	}
 	changeMapOptions({});

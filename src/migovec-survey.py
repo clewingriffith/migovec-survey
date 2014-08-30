@@ -83,7 +83,8 @@ class PutLabel(webapp2.RequestHandler):
 
 		idInPayload = json_data['id']
 		
-		if label_id != idInPayload:
+		if str(label_id) != str(idInPayload):
+			print "label_id",label_id,"does not match payload",idInPayload
 			self.error(400)
 			
 		#except:

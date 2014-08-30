@@ -982,6 +982,7 @@ function updateLabelField() {
 function saveLabelField() {
 	var labelInputId = document.getElementById('labelInputId');
 	var labelInputYearDiscovered = document.getElementById('labelInputYearDiscovered')
+	var labelInputText = document.getElementById('labelInputText')
 	if(!isNaN(labelInputId.value)) {
 		var label;
 		if(window.displayOptions["projection"] == "PLAN") {
@@ -993,10 +994,10 @@ function saveLabelField() {
 		label.set('unsaved', false);
 		label.set('fontColor', 'black'); //to show that it has been saved
 		label.set('year_discovered', parseInt(labelInputYearDiscovered.value));
-		
+		label.set('text', labelInputText.value);
 		updateLabelDatastore({
 			"id": label.datakey, 
-			"text_en":label.text,
+			"text_en":labelInputText.value,
 			"year_discovered":labelInputYearDiscovered.value
 		});
 	}

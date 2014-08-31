@@ -38,29 +38,58 @@ def readHeader(file):
 	timestamp = readLine(file)
 	print "Timestamp:",timestamp
 
+
+
 def readSurvey(file):
+	
 	currentLabel = ""
+	
+	def readLabel(label):
+		newLabel = label;
+		bytes=file.read(1)
+		labelLength=int(struct.unpack("B",bytes)[0])
+		print "LabelLength",labelLength
+		labelSection = file.read(labelLength)
+		newLabel += labelSection
+		print "+",labelSection
+		print newLabel
+		return newLabel
+	
 	while True:
 		code = file.read(1)
-		print struct.unpack("B",code)
+		print hex(ord(code)),
 		if code == '\x00': #STOP
+			print ":STOP"
 			if currentLabel == "":
 				print "End Of File"
 				break
+			else:
+				currentLabel = ""
 		elif code >= '\x01' and code <= '\x0e': #TRIM
-			print "TRIM"
+			print ":TRIM"
+			n=ord(code)-ord('\x01')+1
+			print n
+			currentLabel = currentLabel[:-16]
+			for dot in range(n):
+				currentLabel = currentLabel[:currentLabel.rfind(".")]
+			currentLabel = currentLabel + "."
+			print currentLabel
 		elif code == '\x0f': #MOVE
 			bytes = file.read(4*3)
 			x,y,z = struct.unpack("<iii", bytes)
-			print "MOVE",0.01*x,0.01*y,0.01*z
+			print ":MOVE",0.01*x,0.01*y,0.01*z
 		elif code >= '\x10' and code <= '\x1f':#TRIM
-			print "TRIM"
+			print ":TRIM"
+			n=ord(code)-ord('\x10')+1
+			print n
+			currentLabel = currentLabel[:-n]
+			print currentLabel
 		elif code == '\x20': #DATE
 			bytes = file.read(2)
 			daysSince1900 = struct.unpack("<H", bytes)
 			dateAt1900 = datetime.date(1900,1,1)
 			surveydate = dateAt1900 + datetime.timedelta(daysSince1900[0])
-			print "DATE:",surveydate
+			print ":DATE:",surveydate
 		elif code == '\x21': #DATESPAN
 			bytes = file.read(3)
 			daysSince1900,daysSinceDate1 = struct.unpack("<HB", bytes)
@@ -71,6 +100,7 @@ def readSurvey(file):
 			bytes = file.read(4*5)
 			numLegs,traverseLength,E,H,V = struct.unpack("<iiiii", bytes)
 		elif code == '\x23':#DATE
+			print ":DATE"
 			bytes = file.read(2*2)
 			days1Since1900,days2Since1900 = struct.unpack("<HH", bytes)
 		elif code == '\x24':#DATE
@@ -78,29 +108,35 @@ def readSurvey(file):
 		elif code >= '\x25' and code <= '\x2f':
 			raise "Found reserved code %s"%code
 		elif code >= '\x30' and code <= '\x31': #XSECT
-			bytes=file.read(2*6)
+			print ":XSECT"
+			currentLabel = readLabel(currentLabel)
+			bytes=file.read(2*4)
 			#length,label,L,R,U,D =
 		elif code >= '\x32' and code <= '\x33':#XSECT
-			bytes=file.read(2*6)
+			print ":XSECT"
+			currentLabel = readLabel(currentLabel)
+			bytes=file.read(4*4)
 		elif code >= '\x34' and code <= '\x3f':
 			raise "Found reserved code %s"%code
 		elif code >= '\x40' and code <= '\x7f': #LABEL
-			print "LABEL"
-			bytes=file.read(1)
-			labelLength=int(struct.unpack("B",bytes)[0])
-			print "LabelLength",labelLength
-			labelSection = file.read(labelLength)
+			print ":LABEL"
+			currentLabel = readLabel(currentLabel)
 			bytes = file.read(4*3)
 			x,y,z = struct.unpack("<iii", bytes)
-			print labelSection
+			#print labelSection
 		elif code >= '\x80' and code <= '\xbf':
-			bytes=file.read(1)
-			labelLength=int(struct.unpack("B",bytes)[0])
-			labelSection = file.read(labelLength)
-			print labelSection
+			print ":LINE"
+			#bytes=file.read(1)
+			#labelLength=int(struct.unpack("B",bytes)[0])
+			#print "len=",labelLength
+			#labelSection = file.read(labelLength)
+			#currentLabel += labelSection
+			#print "+",labelSection
+			#print currentLabel
+			currentLabel = readLabel(currentLabel)
 			bytes = file.read(4*3)
 			x,y,z = struct.unpack("<iii", bytes)
-			print "LINE",0.01*x,0.01*y,0.01*z
+			print 0.01*x,0.01*y,0.01*z
 		else:
 			raise "Found reserved code %s"%code
 

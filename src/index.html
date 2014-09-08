@@ -20,7 +20,8 @@
                 <link rel="apple-touch-icon" href="static/icons/miglogoIcon.png"/>  
                 
                 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBt22ZSRQ418n6tFZkK0ghcNy0NyZRamdg&sensor=false"></script>
-                
+		<script type="text/javascript" src="static/three.min.js"></script>
+		<script type="text/javascript" src="static/OrbitControls.js"></script>
                 <script type="text/javascript" src="static/jquery-1.11.1/jquery.min.js"></script>
                 <script type="text/javascript" src="static/jquery.json-2.4.min.js"></script>
                 <script type="text/javascript" src="static/maplabel-compiled.js"></script>
@@ -29,6 +30,7 @@
                 <link rel="stylesheet" type="text/css" href="static/fancybox/jquery.fancybox.css" media="screen" />
                 <script type="text/javascript" src="static/fancybox/helpers/jquery.fancybox-buttons.js"></script>
                 <script type="text/javascript" src="static/mig.js"></script>
+		<script type="text/javascript" src="static/3dSurveyView.js"></script>
         </head>
 
  <body>
@@ -115,13 +117,17 @@
 								
 				        </div>
 
-					
+
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-							
-                                <ul class="nav navbar-nav navbar-right">
-				
-                                        <li class="active"><a href="#" id="plan" class="btn">Plan</a></li>
-                                        <li id="elevationItem"><a href="#" id="elevation" data-toggle="button">Elevation</a></li>
+					
+
+
+                                <ul class="nav navbar-nav navbar-right"><!-- navbar-nav navbar-right -->
+		
+
+					<li><a href="#3dview" id="3dView" data-toggle="tab" class="btn"><span class="badge alert-danger pull-right">beta</span>3D </a></li>
+                                        <li class="active"><a href="#gmaps" id="plan" data-toggle="tab" class="btn">Plan</a></li>
+                                        <li id="elevationItem"><a href="#gmaps" id="elevation" data-toggle="tab">Elevation</a></li>
                                         <li class="dropdown">
                                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Options<span class="caret"></span></a>
                                                 <ul class="dropdown-menu" role="menu">
@@ -139,9 +145,18 @@
               </div><!-- /.container-fluid -->
       </nav>
       
-      
       <div id="mainpage" class="fill">
-      <div class="row fill">
+	<div class="tab-content fill">
+		<div class="tab-pane active fill" id="gmaps">
+			
+ <!--     
+      </div>
+      </div>
+      <div class="tab-pane fill" id="3dview">
+    
+   
+	</div> -->
+	<div id="maprow" class="row fill">
       	<div id="editPanel" class="col-md-3 hidden">
 		<div class="visible-lg">
 			<div id="edit-palette">
@@ -165,7 +180,7 @@
 					 <label for="labelInputYearDiscovered">year discovered</label>
 					 <input type="year" class="form-control" id="labelInputYearDiscovered" value="1976" />
 				</div>
-				<button type="button" class="btn btn-primary" onclick="addTextLabel();">Add Label</button>  <!-- on click="addTextLabel()" -->
+				<button type="button" class="btn btn-primary" onclick="addTextLabel();">Add Label</button>  
 				<button type="button" class="btn btn-warning" onclick="saveLabelField();">Modify Label</button>
 				</fieldset>
 				</form> 
@@ -185,18 +200,26 @@
 						<label for="photoInputCaption">Caption</label>
 						<input type="text" class="form-control" id="photoInputCaption"  placeholder="" />
 					</div>	
-					<button type="button" class="btn btn-primary" onclick="addNewPhoto();">Add Photo</button>  <!-- on click="addNewPhoto()" -->
+					<button type="button" class="btn btn-primary" onclick="addNewPhoto();">Add Photo</button> 
 					</fieldset>
 				</form>
 			</div>
 		</div>
 	</div>	
-	<div id="mapPanel" class="fill">
-		 <div id="map-canvas"/>
+	<div id="mapPanel" class="col-md-12 fill">
+		<div id="map-canvas" ></div>
 	</div>
-
-</div>
-</div>
+	</div>
+	
+			
+		</div>
+		<div class="tab-pane fill" id="3dview">
+		  	<div id="canvas3d" class="col-md-12 fill"></div> 
+	</div> 
+				  
+		</div>
+		</div>
+	</div>
 
  </body>
 </html>

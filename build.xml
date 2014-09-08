@@ -35,6 +35,13 @@
 				<!-- no longer needed <size value="980" when="more"/> -->
 			</fileset>
 		</copy>
+		<copy todir="dist/migovec-survey/survey">
+			<fileset dir="src/survey">
+				<patternset>
+					<include name="**/*.3d"/>
+				</patternset>
+			</fileset>
+		</copy>
 		<copy todir="dist/migovec-survey/static/">
 			<fileset dir="src">
 				<include name="**/*.kml"/>
@@ -69,5 +76,13 @@
 			<arg value="removeDuplicateTiles.py" />
 		</exec>
 	</target>
-	
+
+	<target name="convert-survex-3d" description="convert survex 3d format survey">
+		<exec executable="python">
+			<arg value="readSurvex3d.py" />
+			<arg value="src/survey/survex/s_garden.3d" />
+			<arg value="dist/migovec-survey/static/garden.json" />
+		</exec>
+	</target>
+
 </project>

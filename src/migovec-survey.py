@@ -233,6 +233,21 @@ class GetSurvey2(webapp2.RequestHandler):
 	def get(self):
 		print "GetSurvey2",self.route
 
+#commented out because it's probably better to build during the build step,
+#unless users can upload 3d files
+"""
+class Get3dSurvey(webapp2.RequestHandler):
+	def get(self):
+		self.response.headers['Content-Type'] = 'application/json'
+		self.response.headers['Cache-Control'] = 'max-age=60'
+		survexFile = open('survey/survex/s_garden.3d', 'rb')
+		surveyWriter = readSurvex3d.SurveyWriter()
+		readSurvex3d.readHeader(survexFile)
+		readSurvex3d.readSurvey(survexFile, surveyWriter)
+		survey = surveyWriter.getSurvey()
+		self.response.out.write(json.dumps(survey))
+"""
+
 app = webapp2.WSGIApplication([('/', MainPage), 
 ('/login', Login),
 ('/labels/(.*)',GetLabels), 

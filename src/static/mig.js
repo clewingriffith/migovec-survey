@@ -187,14 +187,16 @@ var initialize = function() {
 	
 	jQuery("#elevation").click(function(e) {
 		changeMapOptions({"projection": "EXTENDED_ELEVATION"});
-		jQuery("#elevation").parent().addClass("active");
+	/*	jQuery("#elevation").parent().addClass("active");
 		jQuery("#plan").parent().removeClass("active");
+		jQuery("#3dView").parent().removeClass("active");*/
 	});
 	
 	jQuery("#plan").click(function(e) {
 		changeMapOptions({"projection": "PLAN"});
-		jQuery("#plan").parent().addClass("active");
+	/*	jQuery("#plan").parent().addClass("active");
 		jQuery("#elevation").parent().removeClass("active");
+		jQuery("#3dView").parent().removeClass("active");*/
 	});
 	
 	jQuery("#labels").click(function(e) {
